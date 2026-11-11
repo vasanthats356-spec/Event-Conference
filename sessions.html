@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Event Conference - Sessions</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+
+<style>
+  :root {
+    /* Strictly Light Theme Variables */
+    --bg-base:          #F8F5FF; /* Very Light Violet */
+    --bg-surface:       #FFFFFF; /* Pure White */
+    --bg-accent-tint:   #F1ECFF; /* Soft Lavender */
+    
+    /* Consistent Text Colors */
+    --text-main:        #1A1046; /* Deep Violet */
+    --text-muted:       #6B5B95; /* Soft Violet */
+    
+    --conf-accent:      #7C3AED; 
+    --conf-accent-d:    #6D28D9;
+    --conf-gold:        #FFC93C; 
+    --conf-gold-d:      #F0A500;
+    
+    --conf-border:      rgba(124, 58, 237, 0.15);
+    --conf-shadow:      0 15px 35px rgba(26, 16, 70, 0.06);
+    
+    --nav-h:            110px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+  html { scroll-behavior: smooth; }
+  
+  html, body { 
+    overflow-x: hidden; 
+    max-width: 100vw; 
+    background-color: var(--bg-base) !important; 
+  }
+  
+  body {
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--nav-h) !important; 
+  }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #EBE4F7; }
+  ::-webkit-scrollbar-thumb { background: var(--conf-accent); border-radius: 6px; }
+
+  /* ===== Z-INDEX & LAYOUT FIX ===== */
+  #header-placeholder {
+    width: 100%;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 9999;
+  }
+  .navbar { z-index: 9999 !important; }
+  #footer-placeholder { width: 100%; }
+
+  .main-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  /* Shared Utilities */
+  .section-header-center {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 50px;
+  }
+  .section-title {
+    font-size: clamp(2rem, 3vw, 2.8rem);
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .section-desc {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px 32px;
+    border-radius: 60px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: 1.5px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn i { transition: transform 0.3s ease; }
+  .btn:hover i.fa-arrow-right { transform: translateX(4px); }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, var(--conf-gold), var(--conf-gold-d));
+    color: var(--text-main);
+    box-shadow: 0 8px 24px rgba(255, 201, 60, 0.3);
+  }
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(255, 201, 60, 0.5);
+  }
+  .btn-outline {
+    background: transparent;
+    border-color: var(--conf-accent);
+    color: var(--conf-accent);
+  }
+  .btn-outline:hover {
+    background: var(--conf-accent);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+  }
+  
+  .section-cta-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+  }
+
+  /* ===================================================
+     SECTION 1: HERO (Split Layout)
+     =================================================== */
+  .split-hero {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 80px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    background: var(--bg-base);
+  }
+  .split-hero-text .badge {
+    display: inline-block;
+    background: rgba(124, 58, 237, 0.08);
+    color: var(--conf-accent);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border-radius: 30px;
+    margin-bottom: 24px;
+  }
+  .split-hero-text h1 {
+    font-size: clamp(2.8rem, 5vw, 4.2rem);
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.1;
+    margin-bottom: 24px;
+    letter-spacing: -1.5px;
+  }
+  .split-hero-text h1 span { color: var(--conf-accent); }
+  .split-hero-text p {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+  .split-hero-image {
+    position: relative;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: var(--conf-shadow);
+    height: 500px;
+    border: 1px solid var(--conf-border);
+  }
+  .split-hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ===================================================
+     SECTION 2: TRACKS (Interactive Accordion)
+     =================================================== */
+  .accordion-section {
+    padding: 100px 24px;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--conf-border);
+  }
+  .accordion-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .accordion-item {
+    background: var(--bg-base);
+    border: 1px solid var(--conf-border);
+    border-radius: 20px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  .accordion-item:hover {
+    border-color: var(--conf-accent);
+  }
+  .accordion-item.open {
+    background: #fff;
+    border-color: var(--conf-accent);
+    box-shadow: var(--conf-shadow);
+  }
+  .accordion-header {
+    width: 100%;
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    text-align: left;
+  }
+  .accordion-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .accordion-icon {
+    width: 50px; height: 50px;
+    background: rgba(124, 58, 237, 0.1);
+    color: var(--conf-accent);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .accordion-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text-main);
+  }
+  .accordion-arrow {
+    font-size: 1.2rem;
+    color: var(--conf-accent);
+    transition: transform 0.4s ease;
+  }
+  .accordion-item.open .accordion-arrow {
+    transform: rotate(180deg);
+  }
+  .accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+  .accordion-content {
+    padding: 0 32px 32px;
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    border-top: 1px solid var(--conf-border);
+    padding-top: 24px;
+  }
+  .accordion-img {
+    width: 200px;
+    height: 140px;
+    border-radius: 16px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .accordion-text p {
+    font-size: 1rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  /* ===================================================
+     SECTION 3: FEATURED SESSIONS (Structured Grid)
+     =================================================== */
+  .featured-section {
+    padding: 100px 24px;
+    background: var(--bg-base);
+  }
+  .featured-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+  .featured-card {
+    background: #fff;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid var(--conf-border);
+    box-shadow: var(--conf-shadow);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .featured-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--conf-shadow-hover);
+  }
+  .featured-img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+  }
+  .featured-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .featured-tag {
+    display: inline-block;
+    background: rgba(255, 201, 60, 0.15);
+    color: var(--conf-gold-d);
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+    align-self: flex-start;
+  }
+  .featured-content h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  .featured-content p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 24px;
+    flex: 1;
+  }
+  .featured-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--conf-border);
+    padding-top: 16px;
+    margin-top: auto;
+  }
+  .featured-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+  .featured-author img {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .featured-link {
+    color: var(--conf-accent);
+    font-size: 1.1rem;
+    transition: 0.3s;
+  }
+  .featured-link:hover {
+    transform: translateX(5px);
+  }
+
+  /* ===================================================
+     SECTION 4: SCHEDULE (Zig-Zag Timeline)
+     =================================================== */
+  .timeline-section {
+    padding: 100px 24px;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--conf-border);
+  }
+  .timeline-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+    padding: 20px 0;
+  }
+  .timeline-wrapper::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: var(--conf-border);
+    transform: translateX(-50%);
+  }
+  .timeline-item {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 50%;
+    position: relative;
+    margin-bottom: 40px;
+  }
+  .timeline-item:nth-child(even) {
+    justify-content: flex-start;
+    padding-right: 0;
+    padding-left: 50%;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: 50%;
+    top: 30px;
+    width: 24px; height: 24px;
+    background: var(--bg-surface);
+    border: 4px solid var(--conf-accent);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 0 6px rgba(124, 58, 237, 0.1);
+    z-index: 2;
+  }
+  .timeline-card {
+    background: var(--bg-base);
+    border: 1px solid var(--conf-border);
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+    transition: 0.3s;
+    position: relative;
+  }
+  .timeline-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--conf-shadow);
+    border-color: var(--conf-accent);
+  }
+  .timeline-time {
+    display: inline-block;
+    background: var(--conf-accent);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .timeline-card h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 8px;
+  }
+  .timeline-card p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .timeline-card .btn {
+    padding: 8px 20px;
+    font-size: 0.85rem;
+  }
+
+  /* ===================================================
+     SECTION 5: HIGHLIGHTS (Offset Grid)
+     =================================================== */
+  .offset-section {
+    padding: 100px 24px 140px;
+    background: var(--bg-accent-tint);
+  }
+  .offset-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    align-items: start;
+  }
+  .offset-card {
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    height: 400px;
+    box-shadow: var(--conf-shadow);
+    border: 1px solid var(--conf-border);
+  }
+  .offset-card:nth-child(2) {
+    transform: translateY(40px);
+  }
+  .offset-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  .offset-card:hover img {
+    transform: scale(1.1);
+  }
+  .offset-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(26,16,70,0.95), transparent 70%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 30px;
+  }
+  .offset-overlay h3 {
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .offset-overlay p {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+  .offset-overlay .btn {
+    align-self: flex-start;
+    padding: 10px 20px;
+    font-size: 0.85rem;
+    background: #fff;
+    color: var(--text-main);
+  }
+  .offset-overlay .btn:hover {
+    background: var(--conf-gold);
+  }
+
+  /* ===================================================
+     SECTION 6: GIANT CTA
+     =================================================== */
+  .giant-cta-section {
+    padding: 120px 24px;
+    background: var(--bg-surface);
+    text-align: center;
+    border-top: 1px solid var(--conf-border);
+  }
+  .giant-cta-content {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .giant-cta-content h2 {
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -2px;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+  .giant-cta-content h2 span {
+    color: var(--conf-accent);
+  }
+  .giant-cta-content p {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    line-height: 1.6;
+  }
+  .giant-cta-content .btn {
+    font-size: 1.1rem;
+    padding: 20px 50px;
+  }
+
+  /* ===================================================
+     RESPONSIVE
+     =================================================== */
+  @media (max-width: 1024px) {
+    :root { --nav-h: 95px; }
+    .split-hero { grid-template-columns: 1fr; text-align: center; gap: 40px; padding-top: 40px; }
+    .split-hero-text p { margin-inline: auto; }
+    .split-hero-image { height: 400px; }
+    
+    .featured-grid { grid-template-columns: repeat(2, 1fr); }
+    
+    .offset-grid { grid-template-columns: repeat(2, 1fr); }
+    .offset-card:nth-child(2) { transform: translateY(0); }
+    .offset-card:nth-child(3) { grid-column: span 2; height: 300px; }
+  }
+
+  @media (max-width: 768px) {
+    :root { --nav-h: 85px; }
+    
+    /* Accordion Mobile */
+    .accordion-content { flex-direction: column; align-items: flex-start; gap: 20px; }
+    .accordion-img { width: 100%; height: 200px; }
+    
+    /* Featured Grid Mobile */
+    .featured-grid { grid-template-columns: 1fr; }
+    
+    /* Timeline Mobile */
+    .timeline-wrapper::before { left: 20px; }
+    .timeline-item, .timeline-item:nth-child(even) { 
+      justify-content: flex-start; 
+      padding-left: 50px; 
+      padding-right: 0; 
+    }
+    .timeline-dot { left: 20px; }
+    .timeline-card { width: 100%; }
+    
+    /* Offset Mobile */
+    .offset-grid { grid-template-columns: 1fr; }
+    .offset-card:nth-child(3) { grid-column: span 1; }
+    .offset-section { padding-bottom: 100px; }
+    
+    /* Giant CTA Mobile */
+    .giant-cta-content .btn { width: 100%; padding: 16px 30px; font-size: 1rem; }
+  }
+
+  @media (max-width: 480px) {
+    .split-hero-text h1 { font-size: 2.2rem; }
+    .accordion-header { padding: 16px 20px; }
+    .accordion-content { padding: 0 20px 20px; }
+    .accordion-title { font-size: 1.1rem; }
+    .accordion-icon { width: 40px; height: 40px; font-size: 1rem; }
+    .section-cta-wrapper .btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header-placeholder"></div>
+
+<main class="main-content">
+
+  <!-- ============================================================
+       SECTION 1: HERO (Split Layout)
+       ============================================================ -->
+  <section class="split-hero">
+    <div class="split-hero-text" data-aos="fade-right">
+      <span class="badge">Sessions & Schedule</span>
+      <h1>Discover Your <br><span>Next Big Idea</span></h1>
+      <p>Explore 45+ sessions across 6 specialized tracks. From hands-on workshops to visionary keynotes, design your ultimate conference experience.</p>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: inherit;">
+        <a href="404.html" class="btn btn-primary">View Schedule <i class="fa-solid fa-calendar-days"></i></a>
+        <a href="404.html" class="btn btn-outline">Download Brochure</a>
+      </div>
+    </div>
+    <div class="split-hero-image" data-aos="fade-left">
+      <img src="ec11.webp" alt="Conference Sessions" />
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 2: TRACKS (Interactive Accordion)
+       ============================================================ -->
+  <section class="accordion-section">
+    <div class="section-header-center" data-aos="fade-up">
+      <h2 class="section-title">Explore Our Tracks</h2>
+      <p class="section-desc">Click on a track to see what's in store for you.</p>
+    </div>
+
+    <div class="accordion-wrapper" data-aos="fade-up" data-aos-delay="100">
+      
+      <!-- Track 1 -->
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <div class="accordion-title-wrap">
+            <div class="accordion-icon"><i class="fa-solid fa-microchip"></i></div>
+            <span class="accordion-title">AI & Machine Learning</span>
+          </div>
+          <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+        </button>
+        <div class="accordion-body">
+          <div class="accordion-content">
+            <img src="ec12.webp" alt="AI Track" class="accordion-img" />
+            <div class="accordion-text">
+              <p>Dive deep into the latest advancements in generative AI, machine learning models, and ethical AI practices. Featuring hands-on coding labs and visionary keynotes.</p>
+              <a href="404.html" class="btn btn-outline">View 12 Sessions <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Track 2 -->
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <div class="accordion-title-wrap">
+            <div class="accordion-icon"><i class="fa-solid fa-cloud"></i></div>
+            <span class="accordion-title">Cloud & DevOps</span>
+          </div>
+          <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+        </button>
+        <div class="accordion-body">
+          <div class="accordion-content">
+            <img src="ec13.webp" alt="Cloud Track" class="accordion-img" />
+            <div class="accordion-text">
+              <p>Master modern infrastructure, serverless architectures, and Kubernetes. Learn how top companies scale to millions of users seamlessly.</p>
+              <a href="404.html" class="btn btn-outline">View 9 Sessions <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Track 3 -->
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <div class="accordion-title-wrap">
+            <div class="accordion-icon"><i class="fa-solid fa-palette"></i></div>
+            <span class="accordion-title">UX & Product Design</span>
+          </div>
+          <i class="fa-solid fa-chevron-down accordion-arrow"></i>
+        </button>
+        <div class="accordion-body">
+          <div class="accordion-content">
+            <img src="ec14.webp" alt="UX Track" class="accordion-img" />
+            <div class="accordion-text">
+              <p>Discover the future of user experience, design systems, and product-led growth. Perfect for designers and product managers.</p>
+              <a href="404.html" class="btn btn-outline">View 8 Sessions <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Section Button -->
+    <div class="section-cta-wrapper" data-aos="fade-up">
+      <a href="404.html" class="btn btn-primary">Download All Tracks <i class="fa-solid fa-download"></i></a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 3: FEATURED SESSIONS (Structured Grid)
+       ============================================================ -->
+  <section class="featured-section">
+    <div class="section-header-center" data-aos="fade-up">
+      <h2 class="section-title">Featured Sessions</h2>
+      <p class="section-desc">Don't miss these highly anticipated talks and workshops.</p>
+    </div>
+
+    <div class="featured-grid" data-aos="fade-up" data-aos-delay="100">
+      <!-- Card 1 -->
+      <div class="featured-card">
+        <img src="ec15.webp" alt="Keynote" class="featured-img" />
+        <div class="featured-content">
+          <span class="featured-tag">Keynote</span>
+          <h3>The Future of Human-AI Collaboration</h3>
+          <p>An exclusive look at how AI will augment human creativity and productivity over the next decade.</p>
+          <div class="featured-footer">
+            <div class="featured-author">
+              <img src="ec16.webp" alt="Speaker" />
+              Dr. Sarah Chen
+            </div>
+            <a href="404.html" class="featured-link"><i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="featured-card">
+        <img src="ec17.webp" alt="Workshop" class="featured-img" />
+        <div class="featured-content">
+          <span class="featured-tag">Workshop</span>
+          <h3>Building Scalable Microservices</h3>
+          <p>Hands-on lab with the engineering team from Netflix. Learn how to architect systems for scale.</p>
+          <div class="featured-footer">
+            <div class="featured-author">
+              <img src="ec1.webp" alt="Speaker" />
+              James Wilson
+            </div>
+            <a href="404.html" class="featured-link"><i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="featured-card">
+        <img src="ec2.webp" alt="Panel" class="featured-img" />
+        <div class="featured-content">
+          <span class="featured-tag">Panel</span>
+          <h3>Women in Tech Leadership</h3>
+          <p>A candid discussion on breaking barriers and leading teams in the tech industry.</p>
+          <div class="featured-footer">
+            <div class="featured-author">
+              <img src="ec3.webp" alt="Speaker" />
+              Priya Sharma
+            </div>
+            <a href="404.html" class="featured-link"><i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Button -->
+    <div class="section-cta-wrapper" data-aos="fade-up">
+      <a href="404.html" class="btn btn-outline">View All Sessions <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 4: SCHEDULE (Zig-Zag Timeline)
+       ============================================================ -->
+  <section class="timeline-section" id="schedule">
+    <div class="section-header-center" data-aos="fade-up">
+      <h2 class="section-title">Day 1 Schedule</h2>
+      <p class="section-desc">A timeline of the biggest events on the main stage.</p>
+    </div>
+
+    <div class="timeline-wrapper">
+      <!-- Item 1 -->
+      <div class="timeline-item" data-aos="fade-right">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+          <span class="timeline-time">09:00 AM</span>
+          <h3>Opening Keynote</h3>
+          <p>Welcome address by the conference organizers and a visionary keynote on the future of technology.</p>
+          <a href="404.html" class="btn btn-outline">Add to Calendar</a>
+        </div>
+      </div>
+
+      <!-- Item 2 -->
+      <div class="timeline-item" data-aos="fade-left">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+          <span class="timeline-time">11:00 AM</span>
+          <h3>Panel: The AI Revolution</h3>
+          <p>Industry experts discuss the ethical implications and business opportunities of generative AI.</p>
+          <a href="404.html" class="btn btn-outline">Add to Calendar</a>
+        </div>
+      </div>
+
+      <!-- Item 3 -->
+      <div class="timeline-item" data-aos="fade-right">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+          <span class="timeline-time">02:00 PM</span>
+          <h3>Hands-On Workshop</h3>
+          <p>Build your first AI agent using the latest frameworks. Bring your laptop!</p>
+          <a href="404.html" class="btn btn-outline">Add to Calendar</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Button -->
+    <div class="section-cta-wrapper" data-aos="fade-up">
+      <a href="404.html" class="btn btn-primary">Download Full Schedule PDF <i class="fa-solid fa-file-pdf"></i></a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 5: HIGHLIGHTS (Offset Grid)
+       ============================================================ -->
+  <section class="offset-section">
+    <div class="section-header-center" data-aos="fade-up">
+      <h2 class="section-title">Session Highlights</h2>
+      <p class="section-desc">A glimpse into the immersive experiences awaiting you.</p>
+    </div>
+
+    <div class="offset-grid">
+      <div class="offset-card" data-aos="fade-up" data-aos-delay="100">
+        <img src="ec4.webp" alt="Networking" />
+        <div class="offset-overlay">
+          <h3>Interactive Labs</h3>
+          <p>Get your hands dirty with real code and real problems.</p>
+          <a href="404.html" class="btn">Explore Labs</a>
+        </div>
+      </div>
+      
+      <div class="offset-card" data-aos="fade-up" data-aos-delay="200">
+        <img src="ec5.webp" alt="Mentorship" />
+        <div class="offset-overlay">
+          <h3>1-on-1 Mentorship</h3>
+          <p>Book time with senior engineers and product leaders.</p>
+          <a href="404.html" class="btn">Book Session</a>
+        </div>
+      </div>
+
+      <div class="offset-card" data-aos="fade-up" data-aos-delay="300">
+        <img src="ec6.webp" alt="Community" />
+        <div class="offset-overlay">
+          <h3>Community Meetups</h3>
+          <p>Connect with local user groups and open-source maintainers.</p>
+          <a href="404.html" class="btn">Join Meetup</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 6: GIANT CTA
+       ============================================================ -->
+  <section class="giant-cta-section">
+    <div class="giant-cta-content" data-aos="zoom-in">
+      <h2>Ready to <br><span>Join the Sessions?</span></h2>
+      <p>Secure your pass today and guarantee your spot in the most sought-after workshops and keynotes.</p>
+      <a href="404.html" class="btn btn-primary">Register Now <i class="fa-solid fa-ticket"></i></a>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<div id="footer-placeholder"></div>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+  // Init AOS
+  AOS.init({ duration: 800, easing: 'ease-out-cubic', once: true, offset: 80 });
+
+  // Load Header and Footer
+  document.addEventListener('DOMContentLoaded', function () {
+    fetch('header.html')
+      .then(r => r.ok ? r.text() : Promise.reject('Header not found'))
+      .then(d => {
+        document.getElementById('header-placeholder').innerHTML = d;
+        initHeader();
+      })
+      .catch(err => console.warn('Header not loaded:', err));
+
+    fetch('footer.html')
+      .then(r => r.ok ? r.text() : Promise.reject('Footer not found'))
+      .then(d => {
+        document.getElementById('footer-placeholder').innerHTML = d;
+        initFooter();
+      })
+      .catch(err => console.warn('Footer not loaded:', err));
+  });
+
+  /* ============ HEADER INIT ============ */
+  function initHeader() {
+    const hamburger = document.getElementById('hamburgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (hamburger && mobileMenu) {
+      function toggle() {
+        hamburger.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+        document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+      }
+      function close() {
+        hamburger.classList.remove('active');
+        mobileMenu.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      hamburger.addEventListener('click', toggle);
+      document.addEventListener('click', function (e) {
+        if (mobileMenu.classList.contains('active') &&
+            !hamburger.contains(e.target) &&
+            !mobileMenu.contains(e.target)) close();
+      });
+      window.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+      window.addEventListener('resize', () => { if (window.innerWidth > 768) close(); });
+      document.querySelectorAll('.mobile-nav-link, .mobile-action-link').forEach(l =>
+        l.addEventListener('click', close));
+    }
+  }
+
+  /* ============ FOOTER INIT (newsletter) ============ */
+  function initFooter() {
+    const newsForm = document.getElementById('newsletterForm');
+    if (!newsForm) return;
+
+    const emailInput = document.getElementById('newsletterEmail');
+    const alertBox = document.getElementById('newsletterAlert');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function showAlert(msg, type) {
+      alertBox.textContent = msg;
+      alertBox.classList.remove('error', 'success');
+      alertBox.classList.add('show', type);
+    }
+    function clearAlert() {
+      alertBox.textContent = '';
+      alertBox.classList.remove('show', 'error', 'success');
+    }
+
+    newsForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+
+      if (email === '') { showAlert('Please enter your email address.', 'error'); emailInput.focus(); return; }
+      if (!emailRegex.test(email)) { showAlert('Please enter a valid email address.', 'error'); emailInput.focus(); return; }
+
+      showAlert('Subscribed successfully! Redirecting…', 'success');
+      emailInput.value = '';
+      setTimeout(() => { window.location.href = '404.html'; }, 800);
+    });
+
+    emailInput.addEventListener('input', function () {
+      if (alertBox.classList.contains('show')) clearAlert();
+    });
+  }
+
+  /* ============ ACCORDION LOGIC ============ */
+  document.querySelectorAll('.accordion-header').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const item = this.parentElement;
+      const body = item.querySelector('.accordion-body');
+      const isOpen = item.classList.contains('open');
+      
+      // Close all
+      document.querySelectorAll('.accordion-item').forEach(i => {
+        i.classList.remove('open');
+        i.querySelector('.accordion-body').style.maxHeight = null;
+      });
+      
+      // Open clicked
+      if (!isOpen) {
+        item.classList.add('open');
+        body.style.maxHeight = body.scrollHeight + 'px';
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

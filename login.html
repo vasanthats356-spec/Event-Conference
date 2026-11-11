@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>Event Conference - Login</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <!-- Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --conf-night:      #0F0A28;
+      --conf-deep:       #1A1046;
+      --conf-mid:        #2B1B6B;
+      --conf-violet:     #7C3AED;
+      --conf-violet-soft:#A78BFA;
+      --conf-gold:       #FFC93C;
+      --conf-gold-deep:  #F0A500;
+      --conf-text:       #F1ECFF;
+      --conf-muted:      #B9A9E8;
+
+      --ec-border:       rgba(255, 201, 60, 0.30);
+      --ec-input-bg:     rgba(241, 236, 255, 0.06);
+      --ec-input-bd:     rgba(167, 139, 250, 0.28);
+
+      /* space reserved for the fixed navbar */
+      --nav-h:           110px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; }
+
+    html, body { overflow-x: hidden; }
+
+    body {
+      background: var(--conf-night);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      color: var(--conf-text);
+      position: relative;
+      
+      /* Force padding top so content is never hidden under navbar initially */
+      padding-top: var(--nav-h) !important;
+    }
+
+    /* Soft event-style glows */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(110px);
+      z-index: 0;
+      pointer-events: none;
+    }
+    body::before {
+      width: 460px; height: 460px;
+      background: rgba(124, 58, 237, 0.40);
+      top: -160px; left: -160px;
+    }
+    body::after {
+      width: 480px; height: 480px;
+      background: rgba(255, 201, 60, 0.16);
+      bottom: -190px; right: -190px;
+    }
+
+    /* ===== Z-INDEX FIX ===== */
+    /* Header stays on top */
+    #header-placeholder {
+      width: 100%;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 9999; /* Forced to the top layer */
+    }
+
+    /* Main content goes below header when scrolling */
+    .main-wrapper {
+      max-width: 1140px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1; /* Below the header */
+    }
+
+    /* Fallback in case header.html doesn't have high z-index */
+    .navbar {
+      z-index: 9999 !important;
+    }
+
+    /* ===== FORM ALIGNMENT ===== */
+    .login-form-wrapper {
+      display: flex;
+      flex-direction: column; 
+      justify-content: flex-start;
+      align-items: center;
+      padding: 2.5rem 1rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    .login-form-card {
+      /* Using auto margins safely centers the card without clipping the top */
+      margin-top: auto;
+      margin-bottom: auto;
+      position: relative;
+      max-width: 480px;
+      width: 100%;
+      background: linear-gradient(160deg, #1A1046 0%, #0F0A28 100%);
+      border-radius: 26px;
+      border: 1.5px solid var(--ec-border);
+      box-shadow:
+        0 30px 70px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(167, 139, 250, 0.08) inset;
+      overflow: hidden;
+    }
+
+    /* Gold ticket strip on top */
+    .login-form-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--conf-gold), #FFE9A3, var(--conf-gold-deep));
+    }
+
+    .login-form-content {
+      padding: 2.9rem 2.5rem 2.4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* ===== BRAND ICON ===== */
+    .login-brand-icon {
+      width: 74px;
+      height: 74px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 201, 60, 0.08);
+      border: 1.5px solid rgba(255, 201, 60, 0.38);
+      box-shadow: 0 0 44px rgba(124, 58, 237, 0.40);
+    }
+    .login-brand-icon i {
+      font-size: 1.85rem;
+      color: var(--conf-gold);
+      filter: drop-shadow(0 6px 16px rgba(255, 201, 60, 0.35));
+    }
+
+    /* ===== CHIP ===== */
+    .login-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 auto 18px;
+      padding: 7px 16px;
+      border-radius: 60px;
+      background: rgba(255, 201, 60, 0.10);
+      border: 1px solid rgba(255, 201, 60, 0.42);
+      color: var(--conf-gold);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+    }
+    .login-chip i { font-size: 0.8rem; }
+
+    .login-form-heading {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .login-form-subhead {
+      font-size: 0.88rem;
+      color: var(--conf-muted);
+      margin-bottom: 24px;
+      line-height: 1.65;
+    }
+    .login-form-subhead strong { color: var(--conf-gold); font-weight: 700; }
+
+    /* ===== GLOBAL ALERTS ===== */
+    .login-global-error,
+    .login-global-success {
+      display: none;
+      padding: 11px 15px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      line-height: 1.55;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .login-global-error {
+      background: rgba(255, 90, 80, 0.12);
+      color: #ffb3ad;
+      border: 1px solid rgba(255, 90, 80, 0.32);
+      border-left: 4px solid #ff5a50;
+    }
+    .login-global-success {
+      background: rgba(255, 201, 60, 0.10);
+      color: #FFE0A0;
+      border: 1px solid rgba(255, 201, 60, 0.35);
+      border-left: 4px solid var(--conf-gold);
+    }
+    .login-global-error.show,
+    .login-global-success.show { display: block; }
+    .login-global-error i,
+    .login-global-success i { margin-right: 6px; }
+
+    /* ===== GOOGLE ===== */
+    .login-google-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 16px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--conf-text);
+      font-size: 0.86rem;
+      transition: all 0.25s ease;
+      border-radius: 10px;
+      padding: 11px 16px;
+      background: var(--ec-input-bg);
+      border: 1.5px solid var(--ec-input-bd);
+      justify-content: center;
+      text-decoration: none;
+    }
+    .login-google-row:hover {
+      background: rgba(241, 236, 255, 0.10);
+      border-color: var(--conf-gold);
+      box-shadow: 0 6px 20px rgba(255, 201, 60, 0.18);
+      transform: translateY(-1px);
+    }
+    .login-google-icon { display: inline-flex; width: 1.35rem; height: 1.35rem; flex-shrink: 0; }
+    .login-google-icon svg { width: 100%; height: 100%; display: block; }
+
+    /* ===== DIVIDER ===== */
+    .login-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin: 4px 0 18px;
+      justify-content: center;
+    }
+    .login-divider hr {
+      flex: 1;
+      border: none;
+      height: 1px;
+      background: rgba(241, 236, 255, 0.12);
+    }
+    .login-divider span {
+      color: rgba(185, 169, 232, 0.75);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    /* ===== INPUTS ===== */
+    .login-input-group {
+      position: relative;
+      margin-bottom: 14px;
+      width: 100%;
+    }
+    .login-input-group > i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--conf-gold);
+      font-size: 0.9rem;
+      width: 1.1rem;
+      text-align: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .login-input-group input,
+    .login-input-group select {
+      width: 100%;
+      padding: 0.78rem 0.9rem 0.78rem 2.5rem;
+      border: 1.5px solid var(--ec-input-bd);
+      border-radius: 10px;
+      font-size: 0.88rem;
+      background: var(--ec-input-bg);
+      transition: 0.18s;
+      outline: none;
+      color: var(--conf-text);
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .login-input-group select {
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 2.5rem;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23FFC93C' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 12px;
+    }
+    .login-input-group select option {
+      background: #1A1046;
+      color: var(--conf-text);
+    }
+
+    .login-input-group input:focus,
+    .login-input-group select:focus {
+      border-color: var(--conf-gold);
+      box-shadow: 0 0 0 3px rgba(255, 201, 60, 0.16);
+      background: rgba(241, 236, 255, 0.09);
+    }
+
+    .login-input-group input::placeholder {
+      color: rgba(241, 236, 255, 0.42);
+      font-weight: 400;
+    }
+
+    /* ===== FIELD ERRORS ===== */
+    .login-error-msg {
+      color: #ff8a80;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      display: none;
+      padding-left: 0.5rem;
+      text-align: left;
+      line-height: 1.4;
+    }
+    .login-error-msg.show { display: block; }
+    .login-input-group.has-error { margin-bottom: 0; }
+    .login-row-options.has-error { margin-bottom: 0; }
+
+    /* ===== OPTIONS ROW ===== */
+    .login-row-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 6px 0 20px;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .login-remember {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.82rem;
+      color: var(--conf-text);
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .login-remember input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--conf-gold);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .login-forgot-link {
+      color: var(--conf-violet-soft);
+      font-size: 0.82rem;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+    .login-forgot-link:hover {
+      color: var(--conf-gold);
+      text-decoration: underline;
+    }
+
+    /* ===== SUBMIT ===== */
+    .login-btn-wrapper { display: flex; margin-bottom: 18px; width: 100%; }
+
+    .login-submit-btn {
+      width: 100%;
+      padding: 0.9rem 0.9rem;
+      background: linear-gradient(135deg, var(--conf-gold), var(--conf-gold-deep));
+      border: none;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: #1A1046;
+      cursor: pointer;
+      transition: all 0.35s ease;
+      letter-spacing: 0.8px;
+      box-shadow: 0 8px 24px rgba(255, 201, 60, 0.30);
+      text-transform: uppercase;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+      transition: left 0.55s ease;
+    }
+    .login-submit-btn:hover::before { left: 100%; }
+    .login-submit-btn:hover {
+      background: linear-gradient(135deg, #FFD766, var(--conf-gold));
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(255, 201, 60, 0.45);
+    }
+    .login-submit-btn:disabled { opacity: 0.85; cursor: wait; transform: none; }
+
+    /* ===== SIGNUP ===== */
+    .login-signup-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--conf-muted);
+    }
+    .login-signup-text a {
+      color: var(--conf-gold);
+      font-weight: 700;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+    .login-signup-text a:hover { text-decoration: underline; }
+
+    /* ===== DEMO HINT ===== */
+    .login-demo-hint {
+      background: rgba(255, 201, 60, 0.06);
+      border: 1px dashed rgba(255, 201, 60, 0.32);
+      border-radius: 10px;
+      padding: 11px 15px;
+      margin-bottom: 18px;
+      font-size: 0.75rem;
+      color: var(--conf-muted);
+      line-height: 1.8;
+      text-align: left;
+    }
+    .login-demo-hint strong { color: var(--conf-gold); font-weight: 700; }
+    .login-demo-hint code {
+      background: rgba(241, 236, 255, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--conf-text);
+      font-weight: 600;
+      font-size: 0.72rem;
+      border: 1px solid rgba(241, 236, 255, 0.10);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      :root { --nav-h: 95px; }
+    }
+
+    @media (max-width: 560px) {
+      .login-form-wrapper { padding: 1.75rem 1rem; }
+      .login-form-card { border-radius: 22px; }
+      .login-form-content { padding: 2.4rem 1.6rem 2rem; }
+      .login-form-heading { font-size: 1.5rem; }
+    }
+
+    @media (max-width: 480px) {
+      :root { --nav-h: 85px; }
+    }
+
+    @media (max-width: 420px) {
+      .login-form-content { padding: 2rem 1.15rem 1.75rem; }
+      .login-brand-icon { width: 62px; height: 62px; margin-bottom: 16px; }
+      .login-brand-icon i { font-size: 1.5rem; }
+      .login-chip { font-size: 0.66rem; padding: 6px 13px; }
+      .login-form-heading { font-size: 1.32rem; }
+      .login-form-subhead { font-size: 0.8rem; margin-bottom: 18px; }
+      .login-input-group input,
+      .login-input-group select { padding: 0.68rem 0.7rem 0.68rem 2.3rem; font-size: 0.82rem; }
+      .login-submit-btn { padding: 0.8rem 0.6rem; font-size: 0.82rem; }
+      .login-error-msg { font-size: 0.72rem; padding-left: 0.4rem; }
+      .login-demo-hint { font-size: 0.7rem; padding: 9px 11px; }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #14102e; }
+    ::-webkit-scrollbar-thumb { background: var(--conf-gold-deep); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--conf-gold); }
+  </style>
+</head>
+<body>
+
+  <div id="header-placeholder"></div>
+
+  <div class="main-wrapper">
+    <div class="login-form-wrapper">
+      <div class="login-form-card">
+
+        <!-- ===== FORM CONTENT ===== -->
+        <div class="login-form-content">
+
+          <div class="login-brand-icon">
+            <i class="fa-solid fa-ticket"></i>
+          </div>
+
+          <span class="login-chip">
+            <i class="fa-solid fa-calendar-day"></i> Event Conference 2026
+          </span>
+
+          <h1 class="login-form-heading">Welcome Back</h1>
+          <p class="login-form-subhead">
+            Sign in to <strong>Event Conference</strong> — manage your pass,
+            pick your sessions, and build your personal schedule.
+          </p>
+
+          <div class="login-global-success" id="loginGlobalSuccess" role="status" aria-live="polite"></div>
+          <div class="login-global-error" id="loginGlobalError" role="alert" aria-live="polite"></div>
+
+          <div class="login-demo-hint">
+            <strong>Demo Accounts:</strong><br>
+            🎟️ Attendee: <code>attendee@eventconference.com</code> / <code>Attendee@123</code><br>
+            🎤 Speaker: <code>speaker@eventconference.com</code> / <code>Speaker@123</code>
+          </div>
+
+          <!-- Google Login -->
+          <a href="404.html" class="login-google-row" id="googleLoginBtn">
+            <span class="login-google-icon">
+              <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+              </svg>
+            </span>
+            <span>Continue with Google</span>
+          </a>
+
+          <div class="login-divider"><hr /><span>Or</span><hr /></div>
+
+          <!-- Role Select -->
+          <div class="login-input-group">
+            <i class="fas fa-user-tag"></i>
+            <select id="loginRoleSelect">
+              <option value="">Select your account type</option>
+              <option value="attendee">Attendee</option>
+              <option value="speaker">Speaker</option>
+            </select>
+          </div>
+          <div class="login-error-msg" id="loginRoleError">Please select your account type.</div>
+
+          <!-- Email -->
+          <div class="login-input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="loginEmail" placeholder="Enter your email address" required />
+          </div>
+          <div class="login-error-msg" id="loginEmailError">Please enter a valid email address.</div>
+
+          <!-- Password -->
+          <div class="login-input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="loginPassword" placeholder="Enter your password" required />
+          </div>
+          <div class="login-error-msg" id="loginPasswordError">Please enter your password.</div>
+
+          <!-- Options -->
+          <div class="login-row-options">
+            <label class="login-remember">
+              <input type="checkbox" id="loginRememberMe" /> Remember Me
+            </label>
+            <a href="404.html" class="login-forgot-link">Forgot Password?</a>
+          </div>
+          <div class="login-error-msg" id="loginCheckboxError">Please check "Remember Me" to continue.</div>
+
+          <!-- Submit -->
+          <div class="login-btn-wrapper">
+            <button class="login-submit-btn" id="loginSubmitBtn">Log In</button>
+          </div>
+
+          <div class="login-signup-text">
+            Not a member yet? <a href="signin.html" id="loginSignupLink">Create an account</a>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <script>
+    // LOAD HEADER + FOOTER
+    document.addEventListener('DOMContentLoaded', function () {
+      fetch('header.html')
+        .then(r => r.ok ? r.text() : Promise.reject('Header not found'))
+        .then(d => {
+          document.getElementById('header-placeholder').innerHTML = d;
+          initHeader();
+        })
+        .catch(err => console.warn('Header not loaded:', err));
+
+      fetch('footer.html')
+        .then(r => r.ok ? r.text() : Promise.reject('Footer not found'))
+        .then(d => {
+          document.getElementById('footer-placeholder').innerHTML = d;
+          initFooter();
+        })
+        .catch(err => console.warn('Footer not loaded:', err));
+    });
+
+    // HEADER INIT
+    function initHeader() {
+      const hamburger = document.getElementById('hamburgerBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      if (hamburger && mobileMenu) {
+        function toggleMenu() {
+          hamburger.classList.toggle('active');
+          mobileMenu.classList.toggle('active');
+          document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+          hamburger.setAttribute('aria-expanded', mobileMenu.classList.contains('active'));
+        }
+        function closeMenu() {
+          hamburger.classList.remove('active');
+          mobileMenu.classList.remove('active');
+          document.body.style.overflow = '';
+          hamburger.setAttribute('aria-expanded', 'false');
+        }
+        hamburger.addEventListener('click', toggleMenu);
+        document.addEventListener('click', function (e) {
+          if (mobileMenu.classList.contains('active')) {
+            if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) closeMenu();
+          }
+        });
+        window.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+        window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
+        document.querySelectorAll('.mobile-nav-link, .mobile-action-link').forEach(l =>
+          l.addEventListener('click', closeMenu));
+      }
+    }
+
+    // FOOTER INIT
+    function initFooter() {
+      const newsForm = document.getElementById('newsletterForm');
+      if (!newsForm) return;
+
+      const emailInput = document.getElementById('newsletterEmail');
+      const alertBox = document.getElementById('newsletterAlert');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      function showAlert(message, type) {
+        alertBox.textContent = message;
+        alertBox.classList.remove('error', 'success');
+        alertBox.classList.add('show', type);
+      }
+      function clearAlert() {
+        alertBox.textContent = '';
+        alertBox.classList.remove('show', 'error', 'success');
+      }
+
+      newsForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+
+        if (email === '') {
+          showAlert('Please enter your email address.', 'error');
+          emailInput.focus();
+          return;
+        }
+        if (!emailRegex.test(email)) {
+          showAlert('Please enter a valid email address.', 'error');
+          emailInput.focus();
+          return;
+        }
+
+        showAlert('Subscribed successfully! Redirecting…', 'success');
+        emailInput.value = '';
+        setTimeout(() => { window.location.href = '404.html'; }, 800);
+      });
+
+      emailInput.addEventListener('input', function () {
+        if (alertBox.classList.contains('show')) clearAlert();
+      });
+    }
+
+    // LOGIN LOGIC
+    (function login() {
+      const roleSelect = document.getElementById('loginRoleSelect');
+      const emailInput = document.getElementById('loginEmail');
+      const passwordInput = document.getElementById('loginPassword');
+      const rememberCheck = document.getElementById('loginRememberMe');
+
+      const roleError = document.getElementById('loginRoleError');
+      const emailError = document.getElementById('loginEmailError');
+      const passwordError = document.getElementById('loginPasswordError');
+      const checkboxError = document.getElementById('loginCheckboxError');
+      const globalError = document.getElementById('loginGlobalError');
+
+      const loginBtn = document.getElementById('loginSubmitBtn');
+
+      const USERS_KEY = 'event_conference_users';
+      const SESSION_KEY = 'event_conference_session';
+      const SESSION_TTL_MS = 1000 * 60 * 60 * 2;
+
+      const DEMO_USERS = {
+        'attendee@eventconference.com': { password: 'Attendee@123', name: 'Attendee User',  userId: 'EC-A001', role: 'attendee' },
+        'speaker@eventconference.com':  { password: 'Speaker@123',  name: 'Speaker Account', userId: 'EC-S001', role: 'speaker'  }
+      };
+
+      const ROLE_NAMES = { attendee: 'Attendee', speaker: 'Speaker' };
+
+      function loadRegisteredUsers() {
+        try {
+          const raw = localStorage.getItem(USERS_KEY);
+          const list = raw ? JSON.parse(raw) : [];
+          const map = {};
+          list.forEach(u => {
+            if (!u || !u.email) return;
+            map[u.email.toLowerCase()] = {
+              password: u.password,
+              name: u.name,
+              userId: u.userId,
+              role: u.role || 'attendee'
+            };
+          });
+          return map;
+        } catch (e) { return {}; }
+      }
+
+      function setError(errEl, group, show) {
+        if (show) { errEl.classList.add('show'); if (group) group.classList.add('has-error'); }
+        else { errEl.classList.remove('show'); if (group) group.classList.remove('has-error'); }
+      }
+      function clearGlobal() { globalError.classList.remove('show'); globalError.innerHTML = ''; }
+      function showGlobal(msg) {
+        globalError.innerHTML = '<i class="fas fa-exclamation-circle"></i>' + msg;
+        globalError.classList.add('show');
+      }
+
+      roleSelect.addEventListener('change', () => {
+        if (roleSelect.value) setError(roleError, roleSelect.closest('.login-input-group'), false);
+        clearGlobal();
+      });
+      emailInput.addEventListener('input', () => {
+        if (emailInput.value.trim()) setError(emailError, emailInput.closest('.login-input-group'), false);
+        clearGlobal();
+      });
+      passwordInput.addEventListener('input', () => {
+        if (passwordInput.value.trim()) setError(passwordError, passwordInput.closest('.login-input-group'), false);
+        clearGlobal();
+      });
+      rememberCheck.addEventListener('change', () => {
+        if (rememberCheck.checked) setError(checkboxError, rememberCheck.closest('.login-row-options'), false);
+        clearGlobal();
+      });
+
+      const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+      loginBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        clearGlobal();
+        let valid = true;
+
+        if (!roleSelect.value) {
+          roleError.textContent = 'Please select your account type.';
+          setError(roleError, roleSelect.closest('.login-input-group'), true);
+          valid = false;
+        } else setError(roleError, roleSelect.closest('.login-input-group'), false);
+
+        const email = emailInput.value.trim().toLowerCase();
+        if (!email || !emailOk(email)) {
+          emailError.textContent = 'Please enter a valid email address.';
+          setError(emailError, emailInput.closest('.login-input-group'), true);
+          valid = false;
+        } else setError(emailError, emailInput.closest('.login-input-group'), false);
+
+        const pwd = passwordInput.value;
+        if (!pwd) {
+          passwordError.textContent = 'Please enter your password.';
+          setError(passwordError, passwordInput.closest('.login-input-group'), true);
+          valid = false;
+        } else setError(passwordError, passwordInput.closest('.login-input-group'), false);
+
+        if (!rememberCheck.checked) {
+          checkboxError.textContent = 'Please check "Remember Me".';
+          setError(checkboxError, rememberCheck.closest('.login-row-options'), true);
+          valid = false;
+        } else setError(checkboxError, rememberCheck.closest('.login-row-options'), false);
+
+        if (!valid) return;
+
+        const freshUsers = Object.assign({}, DEMO_USERS, loadRegisteredUsers());
+        const record = freshUsers[email];
+
+        if (!record) {
+          showGlobal('No account found with <strong>' + email + '</strong>. Please check your email or create an account.');
+          return;
+        }
+        if (record.password !== pwd) {
+          showGlobal('Incorrect password. Please try again.');
+          return;
+        }
+        if (record.role !== roleSelect.value) {
+          showGlobal('This account is registered as <strong>' + (ROLE_NAMES[record.role] || record.role) + '</strong>. Please select the correct account type.');
+          return;
+        }
+
+        const session = {
+          authenticated: true,
+          userId: record.userId,
+          name: record.name,
+          email,
+          role: record.role,
+          issuedAt: Date.now(),
+          expiresAt: Date.now() + SESSION_TTL_MS
+        };
+
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Logging in…';
+
+        try {
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+          if (rememberCheck.checked) localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+          else localStorage.removeItem(SESSION_KEY);
+        } catch (err) {
+          showGlobal('Could not save your session.');
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Log In';
+          return;
+        }
+
+        setTimeout(function () {
+          if (record.role === 'attendee')     window.location.href = 'attendee-dashboard.html';
+          else if (record.role === 'speaker') window.location.href = 'speaker-dashboard.html';
+        }, 300);
+      });
+
+      document.querySelectorAll('.login-input-group input, .login-input-group select').forEach(el => {
+        el.addEventListener('keydown', e => { if (e.key === 'Enter') loginBtn.click(); });
+      });
+
+      console.log('🎟️ Event Conference login page ready! (2 roles: attendee / speaker)');
+    })();
+  </script>
+
+</body>
+</html>

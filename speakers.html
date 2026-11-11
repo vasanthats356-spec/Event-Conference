@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Event Conference - Speakers</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+
+<style>
+  :root {
+    /* Strictly Light Theme Variables */
+    --bg-base:          #F8F5FF; /* Very Light Violet */
+    --bg-surface:       #FFFFFF; /* Pure White */
+    --bg-accent-tint:   #F1ECFF; /* Soft Lavender */
+    
+    /* Consistent Text Colors */
+    --text-main:        #1A1046; /* Deep Violet */
+    --text-muted:       #6B5B95; /* Soft Violet */
+    
+    --conf-accent:      #7C3AED; 
+    --conf-accent-d:    #6D28D9;
+    --conf-gold:        #FFC93C; 
+    --conf-gold-d:      #F0A500;
+    
+    --conf-border:      rgba(124, 58, 237, 0.15);
+    --conf-shadow:      0 15px 35px rgba(26, 16, 70, 0.06);
+    --conf-shadow-hover:0 20px 40px rgba(26, 16, 70, 0.1);
+    
+    --nav-h:            110px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+  html { scroll-behavior: smooth; }
+  
+  html, body { 
+    overflow-x: hidden; 
+    max-width: 100vw; 
+    background-color: var(--bg-base) !important; 
+  }
+  
+  body {
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--nav-h) !important; 
+  }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #EBE4F7; }
+  ::-webkit-scrollbar-thumb { background: var(--conf-accent); border-radius: 6px; }
+
+  /* ===== Z-INDEX & LAYOUT FIX ===== */
+  #header-placeholder {
+    width: 100%;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 9999;
+  }
+  .navbar { z-index: 9999 !important; }
+  #footer-placeholder { width: 100%; }
+
+  .main-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  /* Shared Utilities */
+  .section-header-center {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 50px;
+  }
+  .section-title {
+    font-size: clamp(2rem, 3vw, 2.8rem);
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .section-desc {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px 32px;
+    border-radius: 60px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: 1.5px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn i { transition: transform 0.3s ease; }
+  .btn:hover i.fa-arrow-right { transform: translateX(4px); }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, var(--conf-gold), var(--conf-gold-d));
+    color: var(--text-main);
+    box-shadow: 0 8px 24px rgba(255, 201, 60, 0.3);
+  }
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(255, 201, 60, 0.5);
+  }
+  .btn-outline {
+    background: transparent;
+    border-color: var(--conf-accent);
+    color: var(--conf-accent);
+  }
+  .btn-outline:hover {
+    background: var(--conf-accent);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+  }
+
+  /* ===================================================
+     SECTION 1: HERO (Spotlight Layout)
+     =================================================== */
+  .spotlight-hero {
+    padding: 100px 24px 140px;
+    background: linear-gradient(180deg, var(--bg-accent-tint) 0%, var(--bg-base) 100%);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .spotlight-hero::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 60%);
+    border-radius: 50%;
+    z-index: 0;
+  }
+  .spotlight-hero .badge {
+    display: inline-block;
+    background: rgba(124, 58, 237, 0.08);
+    color: var(--conf-accent);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    border-radius: 30px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 2;
+  }
+  .spotlight-hero h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.1;
+    margin-bottom: 24px;
+    letter-spacing: -1.5px;
+    position: relative;
+    z-index: 2;
+  }
+  .spotlight-hero h1 span { color: var(--conf-accent); }
+  .spotlight-hero p {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    max-width: 650px;
+    margin: 0 auto 50px;
+    line-height: 1.7;
+    position: relative;
+    z-index: 2;
+  }
+
+  .spotlight-stage {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  .main-speaker {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    border: 6px solid #fff;
+    box-shadow: 0 20px 50px rgba(26, 16, 70, 0.15);
+    position: relative;
+    z-index: 3;
+    overflow: hidden;
+  }
+  .main-speaker img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .main-speaker-info {
+    position: absolute;
+    bottom: -30px; left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    padding: 16px 30px;
+    border-radius: 20px;
+    box-shadow: var(--conf-shadow);
+    border: 1px solid var(--conf-border);
+    white-space: nowrap;
+    text-align: center;
+  }
+  .main-speaker-info h3 { font-size: 1.2rem; font-weight: 800; color: var(--text-main); }
+  .main-speaker-info p { font-size: 0.85rem; color: var(--conf-accent); font-weight: 700; margin-top: 4px; }
+
+  .float-speaker {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    box-shadow: 0 15px 35px rgba(26, 16, 70, 0.1);
+    overflow: hidden;
+    z-index: 2;
+    animation: float 5s ease-in-out infinite;
+  }
+  .float-speaker img { width: 100%; height: 100%; object-fit: cover; }
+  .float-left { left: 10%; top: 10%; animation-delay: 0s; }
+  .float-right { right: 10%; bottom: 10%; animation-delay: 2.5s; }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+
+  /* ===================================================
+     SECTION 2: THE CIRCLE GRID
+     =================================================== */
+  .circle-grid-section {
+    padding: 100px 24px;
+    background: var(--bg-surface);
+  }
+  .circle-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px 20px;
+  }
+  .circle-card {
+    text-align: center;
+    cursor: pointer;
+  }
+  .circle-img-wrap {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    padding: 6px;
+    background: var(--bg-base);
+    border: 1px solid var(--conf-border);
+    transition: all 0.4s ease;
+    position: relative;
+  }
+  .circle-img-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+    border-radius: 50%;
+    transition: transform 0.4s ease;
+  }
+  /* Hover effect */
+  .circle-card:hover .circle-img-wrap {
+    background: linear-gradient(135deg, var(--conf-gold), var(--conf-gold-d));
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(255, 201, 60, 0.3);
+  }
+  .circle-card:hover .circle-img-wrap img {
+    transform: scale(0.95);
+  }
+  .circle-card h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 4px;
+  }
+  .circle-card p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+  .circle-card .btn {
+    padding: 8px 20px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+  }
+  .circle-card:hover .btn {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===================================================
+     SECTION 3: EDITORIAL NUMBERS (Keynotes)
+     =================================================== */
+  .editorial-section {
+    padding: 100px 24px;
+    background: var(--bg-base);
+    border-top: 1px solid var(--conf-border);
+  }
+  .editorial-row {
+    max-width: 1200px;
+    margin: 0 auto 80px;
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+  }
+  .editorial-row:last-child { margin-bottom: 0; }
+  .editorial-row.reverse {
+    grid-template-columns: 0.8fr 1.2fr;
+  }
+  .editorial-row.reverse .editorial-img { order: 2; }
+  .editorial-row.reverse .editorial-content { order: 1; }
+
+  .editorial-content {
+    position: relative;
+    z-index: 2;
+  }
+  .editorial-number {
+    font-size: 8rem;
+    font-weight: 800;
+    color: rgba(124, 58, 237, 0.05);
+    line-height: 0.8;
+    position: absolute;
+    top: -40px; left: -20px;
+    z-index: -1;
+    letter-spacing: -5px;
+  }
+  .editorial-content h3 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .editorial-content .role {
+    font-size: 1rem;
+    color: var(--conf-accent);
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .editorial-content p {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 30px;
+  }
+  .editorial-img {
+    position: relative;
+    height: 400px;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: var(--conf-shadow);
+    border: 1px solid var(--conf-border);
+  }
+  .editorial-img img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  /* Overlapping quote badge */
+  .editorial-quote {
+    position: absolute;
+    bottom: -20px; right: -20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: var(--conf-shadow);
+    border: 1px solid var(--conf-border);
+    max-width: 250px;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--text-main);
+    font-weight: 500;
+  }
+  .editorial-quote i {
+    color: var(--conf-gold-d);
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* ===================================================
+     SECTION 4: STICKY SIDEBAR LIST
+     =================================================== */
+  .sticky-section {
+    padding: 100px 24px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--conf-border);
+  }
+  .sticky-layout {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 60px;
+    align-items: start;
+  }
+  .sticky-sidebar {
+    position: sticky;
+    top: 130px;
+  }
+  .sticky-sidebar h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.1;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+  }
+  .sticky-sidebar p {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+  .sticky-sidebar .btn {
+    width: 100%;
+  }
+
+  .speaker-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .list-card {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    background: var(--bg-base);
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid var(--conf-border);
+    transition: all 0.3s ease;
+  }
+  .list-card:hover {
+    background: #fff;
+    border-color: var(--conf-accent);
+    box-shadow: var(--conf-shadow);
+    transform: translateX(10px);
+  }
+  .list-avatar {
+    width: 80px; height: 80px;
+    border-radius: 16px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .list-info {
+    flex: 1;
+  }
+  .list-info h3 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 4px;
+  }
+  .list-info .topic {
+    font-size: 0.85rem;
+    color: var(--conf-accent);
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .list-info p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .list-card .btn {
+    padding: 10px 18px;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+
+  /* ===================================================
+     SECTION 5: OVERLAPPING CTA BANNER
+     =================================================== */
+  .overlap-cta-section {
+    padding: 120px 24px;
+    background: var(--bg-accent-tint);
+    overflow: hidden;
+  }
+  .cta-banner {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 30px;
+    border: 1px solid var(--conf-border);
+    box-shadow: var(--conf-shadow);
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 60px 60px 60px 350px; /* Space for the overlapping image */
+    min-height: 350px;
+  }
+  .cta-image {
+    position: absolute;
+    left: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 360px;
+    height: 400px;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 8px solid #fff;
+    box-shadow: 0 20px 40px rgba(26, 16, 70, 0.15);
+  }
+  .cta-image img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .cta-content {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+  }
+  .cta-content h2 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 16px;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+  }
+  .cta-content p {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 30px;
+    max-width: 500px;
+  }
+  .cta-content .btn-group {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* ===================================================
+     RESPONSIVE
+     =================================================== */
+  @media (max-width: 1024px) {
+    :root { --nav-h: 95px; }
+    
+    .circle-grid { grid-template-columns: repeat(3, 1fr); }
+    
+    .editorial-row, .editorial-row.reverse {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      text-align: center;
+    }
+    .editorial-row.reverse .editorial-img { order: 0; }
+    .editorial-row.reverse .editorial-content { order: 0; }
+    .editorial-number { left: 50%; transform: translateX(-50%); top: -60px; font-size: 6rem; }
+    .editorial-img { height: 350px; max-width: 600px; margin: 0 auto; }
+    .editorial-quote { right: 20px; }
+    
+    .sticky-layout { grid-template-columns: 1fr; gap: 40px; }
+    .sticky-sidebar { position: relative; top: 0; text-align: center; }
+    
+    .cta-banner {
+      flex-direction: column;
+      padding: 300px 30px 40px; /* Push content down for image */
+      text-align: center;
+    }
+    .cta-image {
+      top: -40px; left: 50%; transform: translateX(-50%);
+      width: 280px; height: 300px;
+    }
+    .cta-content p { margin-inline: auto; }
+    .cta-content .btn-group { justify-content: center; }
+  }
+
+  @media (max-width: 768px) {
+    :root { --nav-h: 85px; }
+    
+    .spotlight-stage { flex-direction: column; gap: 40px; }
+    .main-speaker { width: 220px; height: 220px; }
+    .float-speaker { width: 100px; height: 100px; }
+    .float-left { left: 0; top: 0; }
+    .float-right { right: 0; bottom: 0; }
+    
+    .circle-grid { grid-template-columns: repeat(2, 1fr); }
+    
+    .list-card { flex-direction: column; text-align: center; }
+    .list-card .btn { width: 100%; margin-top: 15px; }
+    
+    .cta-banner { padding-top: 260px; }
+    .cta-image { width: 240px; height: 260px; }
+    .cta-content .btn-group { flex-direction: column; }
+    .cta-content .btn { width: 100%; }
+  }
+
+  @media (max-width: 480px) {
+    .circle-grid { grid-template-columns: 1fr; }
+    .circle-img-wrap { width: 180px; height: 180px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header-placeholder"></div>
+
+<main class="main-content">
+
+  <!-- ============================================================
+       SECTION 1: HERO (Spotlight Layout)
+       ============================================================ -->
+  <section class="spotlight-hero">
+    <div class="badge" data-aos="fade-down">Meet the Visionaries</div>
+    <h1 data-aos="fade-up" data-aos-delay="100">Learn from the <br><span>Best in the Industry</span></h1>
+    <p data-aos="fade-up" data-aos-delay="200">Get inspired by world-class speakers, industry pioneers, and thought leaders who are shaping the future of technology.</p>
+
+    <div class="spotlight-stage" data-aos="zoom-in" data-aos-delay="300">
+      <!-- Float Left -->
+      <div class="float-speaker float-left">
+        <img src="p1.webp" alt="Speaker" />
+      </div>
+      
+      <!-- Main Speaker -->
+      <div class="main-speaker">
+        <img src="p2.webp" alt="Keynote Speaker" />
+        <div class="main-speaker-info">
+          <h3>Dr. Sarah Chen</h3>
+          <p>Keynote Speaker</p>
+        </div>
+      </div>
+
+      <!-- Float Right -->
+      <div class="float-speaker float-right">
+        <img src="ec17.webp" alt="Speaker" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 2: THE CIRCLE GRID
+       ============================================================ -->
+  <section class="circle-grid-section">
+    <div class="section-header-center" data-aos="fade-up">
+      <h2 class="section-title">The Full Lineup</h2>
+      <p class="section-desc">Discover the brilliant minds taking the stage this year.</p>
+    </div>
+
+    <div class="circle-grid">
+      <!-- Speaker 1 -->
+      <div class="circle-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="circle-img-wrap">
+          <img src="ec16.webp" alt="Speaker" />
+        </div>
+        <h3>Sarah Chen</h3>
+        <p>CTO at TechVision</p>
+        <a href="404.html" class="btn btn-outline">View Bio</a>
+      </div>
+      <!-- Speaker 2 -->
+      <div class="circle-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="circle-img-wrap">
+          <img src="ec15.webp" alt="Speaker" />
+        </div>
+        <h3>James Wilson</h3>
+        <p>Founder of ScaleUp</p>
+        <a href="404.html" class="btn btn-outline">View Bio</a>
+      </div>
+      <!-- Speaker 3 -->
+      <div class="circle-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="circle-img-wrap">
+          <img src="ec14.webp" alt="Speaker" />
+        </div>
+        <h3>Priya Sharma</h3>
+        <p>Lead Designer at UX Lab</p>
+        <a href="404.html" class="btn btn-outline">View Bio</a>
+      </div>
+      <!-- Speaker 4 -->
+      <div class="circle-card" data-aos="fade-up" data-aos-delay="400">
+        <div class="circle-img-wrap">
+          <img src="ec13.webp" alt="Speaker" />
+        </div>
+        <h3>Marcus Johnson</h3>
+        <p>Security Lead at CloudCorp</p>
+        <a href="404.html" class="btn btn-outline">View Bio</a>
+      </div>
+      <!-- Speaker 5 -->
+      <div class="circle-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="circle-img-wrap">
+          <img src="ec12.webp" alt="Speaker" />
+        </div>
+        <h3>Alex Mercer</h3>
+        <p>Crypto Analyst</p>
+        <a href="404.html" class="btn btn-outline">View Bio</a>
+      </div>
+      <!-- Speaker 6 -->
+      <div class="circle-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="circle-img-wrap">
+          <img src="ec11.webp" alt="Speaker" />
+        </div>
+        <h3>David Lee</h3>
+        <p>Product Manager</p>
+        <a href="404.html" class="btn btn-outline">View Bio</a>
+      </div>
+      <!-- Speaker 7 -->
+      <div class="circle-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="circle-img-wrap">
+          <img src="ec10.webp" alt="Speaker" />
+        </div>
+        <h3>Emma Watson</h3>
+        <p>AI Researcher</p>
+        <a href="404.html" class="btn btn-outline">View Bio</a>
+      </div>
+      <!-- Speaker 8 -->
+      <div class="circle-card" data-aos="fade-up" data-aos-delay="400">
+        <div class="circle-img-wrap">
+          <img src="ec9.webp" alt="Speaker" />
+        </div>
+        <h3>Ryan Reynolds</h3>
+        <p>DevOps Advocate</p>
+        <a href="404.html" class="btn btn-outline">View Bio</a>
+      </div>
+    </div>
+
+    <div class="section-cta-wrapper" style="text-align: center; margin-top: 50px;" data-aos="fade-up">
+      <a href="404.html" class="btn btn-primary">View All Speakers <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 3: EDITORIAL NUMBERS (Keynotes)
+       ============================================================ -->
+  <section class="editorial-section">
+    <div class="section-header-center" data-aos="fade-up">
+      <h2 class="section-title">Headline Keynotes</h2>
+      <p class="section-desc">Unmissable talks from our main stage visionaries.</p>
+    </div>
+
+    <!-- Keynote 1 -->
+    <div class="editorial-row" data-aos="fade-up">
+      <div class="editorial-content">
+        <div class="editorial-number">01</div>
+        <h3>The Future of Human-AI Collaboration</h3>
+        <span class="role">Dr. Sarah Chen • CTO at TechVision</span>
+        <p>An exclusive look at how artificial intelligence will augment human creativity and productivity over the next decade. Dr. Chen will explore the ethical boundaries and the immense potential of generative models.</p>
+        <a href="404.html" class="btn btn-outline">Read Abstract <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div class="editorial-img">
+        <img src="ec8.webp" alt="Keynote" />
+        <div class="editorial-quote">
+          <i class="fa-solid fa-quote-left"></i>
+          "AI is not here to replace us, but to elevate what it means to be human."
+        </div>
+      </div>
+    </div>
+
+    <!-- Keynote 2 (Reverse) -->
+    <div class="editorial-row reverse" data-aos="fade-up">
+      <div class="editorial-content">
+        <div class="editorial-number">02</div>
+        <h3>Building the Next Decade of Cloud</h3>
+        <span class="role">James Wilson • Founder of ScaleUp</span>
+        <p>Scaling from zero to millions requires more than just good code. James shares the architectural decisions, team structures, and cultural shifts required to build resilient cloud systems.</p>
+        <a href="404.html" class="btn btn-outline">Read Abstract <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div class="editorial-img">
+        <img src="ec7.webp" alt="Keynote" />
+        <div class="editorial-quote">
+          <i class="fa-solid fa-quote-left"></i>
+          "Startups don't fail because they build the wrong thing, they fail because they build it wrong."
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 4: STICKY SIDEBAR LIST
+       ============================================================ -->
+  <section class="sticky-section">
+    <div class="sticky-layout">
+      
+      <!-- Sticky Sidebar -->
+      <div class="sticky-sidebar" data-aos="fade-right">
+        <h2>Meet the Experts</h2>
+        <p>Our breakout sessions feature hands-on workshops led by industry practitioners who are building the future every day.</p>
+        <a href="404.html" class="btn btn-primary">View Full Roster <i class="fa-solid fa-users"></i></a>
+      </div>
+
+      <!-- Scrolling List -->
+      <div class="speaker-list">
+        <!-- Card 1 -->
+        <div class="list-card" data-aos="fade-left" data-aos-delay="100">
+          <img src="ec6.webp" alt="Speaker" class="list-avatar" />
+          <div class="list-info">
+            <h3>Priya Sharma</h3>
+            <span class="topic">Designing for Accessibility</span>
+            <p>A hands-on session covering the best practices for creating inclusive digital products.</p>
+          </div>
+          <a href="404.html" class="btn btn-outline">View Bio</a>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="list-card" data-aos="fade-left" data-aos-delay="200">
+          <img src="ec5.webp" alt="Speaker" class="list-avatar" />
+          <div class="list-info">
+            <h3>Marcus Johnson</h3>
+            <span class="topic">Securing Cloud Architecture</span>
+            <p>Learn how to protect your cloud infrastructure against modern security threats.</p>
+          </div>
+          <a href="404.html" class="btn btn-outline">View Bio</a>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="list-card" data-aos="fade-left" data-aos-delay="300">
+          <img src="ec4.webp" alt="Speaker" class="list-avatar" />
+          <div class="list-info">
+            <h3>Alex Mercer</h3>
+            <span class="topic">The Future of Web3 & Blockchain</span>
+            <p>Separating the hype from reality in decentralized applications and smart contracts.</p>
+          </div>
+          <a href="404.html" class="btn btn-outline">View Bio</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 5: OVERLAPPING CTA BANNER
+       ============================================================ -->
+  <section class="overlap-cta-section">
+    <div class="cta-banner" data-aos="zoom-in">
+      <!-- Overlapping Image -->
+      <div class="cta-image">
+        <img src="ec3.webp" alt="Speaking at Conference" />
+      </div>
+      
+      <!-- Content -->
+      <div class="cta-content">
+        <h2>Ready to Share <br>Your Big Idea?</h2>
+        <p>We are always looking for passionate speakers to join our lineup. Submit your talk proposal today and inspire thousands of attendees.</p>
+        <div class="btn-group">
+          <a href="404.html" class="btn btn-primary">Submit Proposal <i class="fa-solid fa-paper-plane"></i></a>
+          <a href="404.html" class="btn btn-outline">Speaker Guidelines</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<div id="footer-placeholder"></div>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+  // Init AOS
+  AOS.init({ duration: 800, easing: 'ease-out-cubic', once: true, offset: 80 });
+
+  // Load Header and Footer
+  document.addEventListener('DOMContentLoaded', function () {
+    fetch('header.html')
+      .then(r => r.ok ? r.text() : Promise.reject('Header not found'))
+      .then(d => {
+        document.getElementById('header-placeholder').innerHTML = d;
+        initHeader();
+      })
+      .catch(err => console.warn('Header not loaded:', err));
+
+    fetch('footer.html')
+      .then(r => r.ok ? r.text() : Promise.reject('Footer not found'))
+      .then(d => {
+        document.getElementById('footer-placeholder').innerHTML = d;
+        initFooter();
+      })
+      .catch(err => console.warn('Footer not loaded:', err));
+  });
+
+  /* ============ HEADER INIT ============ */
+  function initHeader() {
+    const hamburger = document.getElementById('hamburgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (hamburger && mobileMenu) {
+      function toggle() {
+        hamburger.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+        document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+      }
+      function close() {
+        hamburger.classList.remove('active');
+        mobileMenu.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      hamburger.addEventListener('click', toggle);
+      document.addEventListener('click', function (e) {
+        if (mobileMenu.classList.contains('active') &&
+            !hamburger.contains(e.target) &&
+            !mobileMenu.contains(e.target)) close();
+      });
+      window.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+      window.addEventListener('resize', () => { if (window.innerWidth > 768) close(); });
+      document.querySelectorAll('.mobile-nav-link, .mobile-action-link').forEach(l =>
+        l.addEventListener('click', close));
+    }
+  }
+
+  /* ============ FOOTER INIT (newsletter) ============ */
+  function initFooter() {
+    const newsForm = document.getElementById('newsletterForm');
+    if (!newsForm) return;
+
+    const emailInput = document.getElementById('newsletterEmail');
+    const alertBox = document.getElementById('newsletterAlert');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function showAlert(msg, type) {
+      alertBox.textContent = msg;
+      alertBox.classList.remove('error', 'success');
+      alertBox.classList.add('show', type);
+    }
+    function clearAlert() {
+      alertBox.textContent = '';
+      alertBox.classList.remove('show', 'error', 'success');
+    }
+
+    newsForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+
+      if (email === '') { showAlert('Please enter your email address.', 'error'); emailInput.focus(); return; }
+      if (!emailRegex.test(email)) { showAlert('Please enter a valid email address.', 'error'); emailInput.focus(); return; }
+
+      showAlert('Subscribed successfully! Redirecting…', 'success');
+      emailInput.value = '';
+      setTimeout(() => { window.location.href = '404.html'; }, 800);
+    });
+
+    emailInput.addEventListener('input', function () {
+      if (alertBox.classList.contains('show')) clearAlert();
+    });
+  }
+</script>
+
+</body>
+</html>

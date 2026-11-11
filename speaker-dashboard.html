@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Event Conference - Speaker Dashboard</title>
+
+<!-- ============================================================
+     AUTH GUARD — runs synchronously BEFORE body renders.
+     ✅ authenticated = true · expiresAt > now · role = speaker
+     ❌ invalid → redirect to login.html
+     ============================================================ -->
+<script>
+(function guardSpeakerDashboard() {
+  let raw = null;
+  try {
+    raw = sessionStorage.getItem('event_conference_session') || localStorage.getItem('event_conference_session');
+  } catch (e) { console.warn('[AUTH] Storage blocked:', e); }
+
+  const session = raw ? JSON.parse(raw) : null;
+  const isValid = session &&
+                  session.authenticated === true &&
+                  typeof session.expiresAt === 'number' &&
+                  session.expiresAt > Date.now() &&
+                  session.role === 'speaker';
+
+  if (!isValid) {
+    try {
+      sessionStorage.removeItem('event_conference_session');
+      localStorage.removeItem('event_conference_session');
+    } catch (_) {}
+    window.location.replace('login.html');
+    return;
+  }
+  window.__CONFERENCE_USER__ = session;
+})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  :root {
+    /* Event Conference Theme */
+    --bg-base:          #F8F5FF; /* Very Light Violet */
+    --bg-surface:       #FFFFFF; /* Pure White */
+    --bg-accent-tint:   #F1ECFF; /* Soft Lavender */
+    
+    --text-main:        #1A1046; /* Deep Violet */
+    --text-muted:       #6B5B95; /* Soft Violet */
+    
+    --conf-accent:      #7C3AED; 
+    --conf-accent-d:    #6D28D9;
+    --conf-gold:        #FFC93C; 
+    --conf-gold-d:      #F0A500;
+    
+    --conf-border:      rgba(124, 58, 237, 0.15);
+    --conf-shadow:      0 4px 24px rgba(26, 16, 70, 0.06);
+    
+    --sidebar-bg:       #1A1046; /* Deep violet sidebar */
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { max-width: 100vw; overflow-x: hidden !important; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg-base);
+    height: 100vh;
+    overflow: hidden;
+    color: var(--text-main);
+    font-size: 14px;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-base); }
+  ::-webkit-scrollbar-thumb { background: var(--conf-accent); border-radius: 10px; }
+
+  /* ===== APP SHELL ===== */
+  .app { display: flex; height: 100vh; width: 100%; overflow: hidden; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 250px;
+    flex-shrink: 0;
+    background: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    border-right: 3px solid var(--conf-gold);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    z-index: 20;
+  }
+  .sidebar-logo {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    padding: 0 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+  }
+  .sidebar-logo img { height: 46px; width: auto; object-fit: contain; display: block; }
+  
+  .sidebar-nav {
+    flex: 1;
+    padding: 14px 12px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .sidebar-nav::-webkit-scrollbar { width: 3px; }
+  .sidebar-nav::-webkit-scrollbar-thumb { background: var(--conf-gold); border-radius: 10px; }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    color: var(--bg-accent-tint);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border-left: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .nav-link i { width: 18px; font-size: 0.9rem; color: var(--text-muted); text-align: center; transition: 0.25s; }
+  .nav-link:hover { background: rgba(255, 255, 255, 0.05); color: #ffffff; border-left-color: var(--conf-gold); }
+  .nav-link:hover i { color: var(--conf-gold); }
+  .nav-link.active {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(124, 58, 237, 0.05));
+    color: #ffffff;
+    border-left-color: var(--conf-gold);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  }
+  .nav-link.active i { color: var(--conf-gold); }
+
+  .nav-divider { height: 1px; background: rgba(255, 255, 255, 0.08); margin: 10px 4px; }
+
+  .nav-link.logout { color: #fca5a5; }
+  .nav-link.logout i { color: #fca5a5; }
+  .nav-link.logout:hover { background: rgba(239, 68, 68, 0.12); color: #fee2e2; border-left-color: #ef4444; }
+
+  .sidebar-footer { padding: 16px; flex-shrink: 0; }
+  .user-badge {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+    position: relative;
+  }
+  .user-badge .icon-circle {
+    width: 36px; height: 36px;
+    background: rgba(255, 201, 60, 0.15);
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--conf-gold);
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+  .user-badge .role { font-size: 0.65rem; font-weight: 700; color: var(--conf-gold); text-transform: uppercase; letter-spacing: 1px; }
+  .user-badge .name { font-size: 0.8rem; color: #ffffff; margin: 4px 0 10px; word-break: break-word; font-weight: 800; }
+  .user-badge .status {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(124, 58, 237, 0.3);
+    border: 1px solid rgba(124, 58, 237, 0.5);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #A78BFA;
+  }
+  .user-badge .status::before {
+    content: ''; width: 6px; height: 6px; background: #A78BFA; border-radius: 50%;
+  }
+  .sidebar-copy { text-align: center; font-size: 0.6rem; color: rgba(255, 255, 255, 0.4); margin-top: 14px; }
+
+  /* ===== MAIN WRAPPER ===== */
+  .main-wrapper {
+    flex: 1; display: flex; flex-direction: column; height: 100vh; min-width: 0; overflow: hidden;
+  }
+
+  /* ===== HEADER ===== */
+  .main-header {
+    background: var(--bg-surface); border-bottom: 1px solid var(--conf-border);
+    padding: 0 24px; height: 72px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; flex-shrink: 0; z-index: 10; position: relative;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  
+  .mobile-logo { display: none; align-items: center; }
+  .mobile-logo img { height: 40px; width: auto; display: block; }
+  .mobile-logo span { font-weight: 800; color: var(--text-main); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+
+  .header-title h1 { font-size: 1.15rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.3px; }
+  .header-title p { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; font-weight: 500; }
+
+  .header-right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+  .date-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-base); border: 1px solid var(--conf-border);
+    border-radius: 10px; padding: 8px 14px;
+    font-size: 0.75rem; font-weight: 700; color: var(--text-main);
+    cursor: pointer; transition: 0.2s;
+  }
+  .date-pill:hover { background: var(--bg-accent-tint); }
+  .date-pill i { color: var(--conf-accent); }
+
+  .bell-btn {
+    position: relative; cursor: pointer; color: var(--text-main);
+    font-size: 1.2rem; transition: 0.2s; background: transparent; border: none; padding: 4px;
+  }
+  .bell-btn:hover { color: var(--conf-accent); }
+  .bell-badge {
+    position: absolute; top: -2px; right: -4px;
+    background: var(--conf-gold); color: var(--text-main);
+    font-size: 0.55rem; font-weight: 800; width: 16px; height: 16px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; border: 2px solid var(--bg-surface);
+  }
+
+  .user-block { display: flex; align-items: center; gap: 12px; padding-left: 16px; border-left: 1px solid var(--conf-border); }
+  .user-text { text-align: right; }
+  .user-text .name { font-size: 0.8rem; font-weight: 800; color: var(--text-main); }
+  .user-text .role { font-size: 0.6rem; color: var(--conf-accent); font-weight: 800; text-transform: uppercase; margin-top: 2px; }
+  .user-avatar {
+    position: relative; width: 38px; height: 38px;
+    background: var(--conf-accent); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 800; font-size: 0.85rem;
+    cursor: pointer; transition: 0.25s;
+  }
+  .user-avatar:hover { background: var(--conf-accent-d); }
+
+  .profile-menu {
+    display: none; position: absolute; top: calc(100% + 8px); right: 0;
+    background: #fff; border: 1px solid var(--conf-border);
+    border-radius: 12px; box-shadow: 0 12px 40px rgba(26, 16, 70, 0.15);
+    width: 180px; padding: 6px 0; z-index: 9999;
+  }
+  .profile-menu.show { display: block; }
+  .profile-menu a {
+    display: block; padding: 10px 18px; font-size: 0.8rem; color: var(--text-main);
+    text-decoration: none; transition: 0.2s; font-weight: 600;
+  }
+  .profile-menu a i { color: var(--conf-accent); margin-right: 10px; width: 14px; }
+  .profile-menu a:hover { background: var(--bg-base); color: var(--conf-accent); }
+  .profile-menu hr { border: none; border-top: 1px solid var(--conf-border); margin: 4px 0; }
+  .profile-menu a.danger { color: #dc2626; }
+  .profile-menu a.danger i { color: #dc2626; }
+  .profile-menu a.danger:hover { background: #fef2f2; }
+
+  .notif-dropdown {
+    display: none; position: absolute; top: calc(100% + 10px); right: 0;
+    background: #fff; border-radius: 14px; border: 1px solid var(--conf-border);
+    border-top: 3px solid var(--conf-gold); box-shadow: 0 20px 60px rgba(26, 16, 70, 0.15);
+    width: 340px; max-width: calc(100vw - 32px); padding: 6px 0; max-height: 420px; overflow-y: auto; z-index: 9999;
+  }
+  .notif-dropdown.show { display: block; }
+  .notif-head {
+    padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--conf-border); position: sticky; top: 0; background: #fff;
+    font-weight: 800; font-size: 0.9rem; color: var(--text-main);
+  }
+  .notif-head .badge { background: var(--conf-accent); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 3px 10px; border-radius: 20px; }
+  .notif-item { padding: 14px 18px; display: flex; gap: 14px; border-bottom: 1px solid var(--bg-base); }
+  .notif-item:last-of-type { border-bottom: none; }
+  .notif-item .ni-icon {
+    width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+  }
+  .notif-item .ni-body { flex: 1; min-width: 0; }
+  .notif-item .ni-title { font-size: 0.8rem; font-weight: 800; color: var(--text-main); }
+  .notif-item .ni-desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+  .notif-item .ni-time { font-size: 0.65rem; color: #9aabba; margin-top: 4px; font-weight: 600; }
+  .notif-footer {
+    display: block; padding: 12px; text-align: center; font-size: 0.75rem; color: var(--conf-accent);
+    font-weight: 800; text-decoration: none; border-top: 1px solid var(--conf-border);
+    position: sticky; bottom: 0; background: #fff;
+  }
+  .notif-footer:hover { background: var(--bg-base); }
+
+  /* ===== MOBILE NAV ===== */
+  .mobile-nav {
+    display: none; background: var(--sidebar-bg); border-bottom: 3px solid var(--conf-gold);
+    padding: 10px 14px; overflow-x: auto; overflow-y: hidden; white-space: nowrap; gap: 8px;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none; flex-shrink: 0;
+  }
+  .mobile-nav::-webkit-scrollbar { display: none; }
+  .mobile-nav .nav-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent; border: none; padding: 8px 16px; font-size: 0.75rem; font-weight: 600;
+    color: var(--bg-accent-tint); border-radius: 30px; cursor: pointer; transition: 0.25s;
+    font-family: inherit; text-decoration: none; flex-shrink: 0;
+  }
+  .mobile-nav .nav-btn i { color: var(--text-muted); font-size: 0.8rem; }
+  .mobile-nav .nav-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+  .mobile-nav .nav-btn.active {
+    background: var(--conf-gold); color: var(--text-main); box-shadow: 0 4px 15px rgba(255, 201, 60, 0.3);
+  }
+  .mobile-nav .nav-btn.active i { color: var(--text-main); }
+  .mobile-nav .nav-btn.logout { color: #fca5a5; }
+  .mobile-nav .nav-btn.logout i { color: #fca5a5; }
+
+  /* ============================================================
+     DASHBOARD BODY
+     ============================================================ */
+  .dash-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 24px; background: var(--bg-base); }
+  
+  .page-title-block { display: none; }
+  .page-title-block h1 { font-size: 1.15rem; font-weight: 800; color: var(--text-main); }
+  .page-title-block p { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+  .content-section { display: none; }
+  .content-section.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--bg-surface); border: 1px solid var(--conf-border); border-radius: 20px;
+    box-shadow: var(--conf-shadow); padding: 24px; transition: 0.3s ease; min-width: 0; position: relative;
+  }
+  .card:hover { box-shadow: 0 12px 32px rgba(26, 16, 70, 0.08); border-color: rgba(124, 58, 237, 0.3); transform: translateY(-2px); }
+  .card-title {
+    font-size: 1rem; font-weight: 800; color: var(--text-main);
+    display: flex; align-items: center; gap: 10px; margin-bottom: 20px; letter-spacing: -0.3px;
+  }
+  .card-title i { color: var(--conf-accent); font-size: 1.1rem; }
+  .card-title .head-right {
+    margin-left: auto; font-size: 0.75rem; font-weight: 800; color: var(--conf-accent);
+    text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .card-title .head-right:hover { color: var(--text-main); text-decoration: underline; }
+  .card-title .head-pill {
+    margin-left: auto; font-size: 0.65rem; font-weight: 800; color: var(--text-main);
+    background: var(--bg-accent-tint); padding: 4px 12px; border-radius: 20px; letter-spacing: 0.5px;
+  }
+
+  /* ===== GRID LAYOUTS ===== */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin-bottom: 24px; }
+  .charts-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-bottom: 24px; }
+  .two-col-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; margin-bottom: 24px; align-items: start; }
+  .right-stack { display: flex; flex-direction: column; gap: 20px; }
+
+  /* ===== STAT CARD ===== */
+  .stat-card {
+    background: var(--bg-surface); border: 1px solid var(--conf-border); border-radius: 20px;
+    box-shadow: var(--conf-shadow); padding: 24px; transition: 0.3s ease; position: relative; overflow: hidden;
+  }
+  .stat-card:hover { box-shadow: 0 12px 32px rgba(124, 58, 237, 0.12); border-color: rgba(124, 58, 237, 0.3); transform: translateY(-3px); }
+  .stat-card .stat-icon {
+    width: 48px; height: 48px; border-radius: 14px;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 16px;
+  }
+  .stat-card .stat-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 8px; }
+  .stat-card .stat-value { font-size: 2.2rem; font-weight: 800; color: var(--text-main); line-height: 1; letter-spacing: -1px; }
+  .stat-card .stat-value small { font-size: 1rem; font-weight: 700; color: var(--text-muted); margin-left: 4px; }
+  .stat-card .trend-badge {
+    position: absolute; top: 24px; right: 24px;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.7rem; font-weight: 800; color: #16a34a; background: #dcfce7; padding: 4px 10px; border-radius: 20px;
+  }
+  .stat-card .trend-badge.soft { color: var(--conf-accent); background: var(--bg-accent-tint); }
+
+  /* ===== CHART ===== */
+  .chart-wrap { height: 160px; width: 100%; }
+
+  /* ===== SESSION ITEMS ===== */
+  .session-item {
+    background: var(--bg-base); border: 1px solid var(--conf-border); border-radius: 16px;
+    padding: 18px 20px; display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; margin-bottom: 12px; transition: 0.25s;
+  }
+  .session-item:last-child { margin-bottom: 0; }
+  .session-item:hover { background: #fff; border-color: var(--conf-accent); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.08); }
+  .session-item .si-body { min-width: 0; flex: 1; }
+  .session-item .si-title { font-size: 0.95rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
+  .session-item .si-meta { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+  .session-item .si-time { font-size: 0.7rem; color: var(--conf-accent); font-weight: 800; background: var(--bg-accent-tint); display: inline-block; padding: 4px 10px; border-radius: 10px; }
+
+  /* Buttons */
+  .btn-primary {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: linear-gradient(135deg, var(--conf-gold), var(--conf-gold-d)); color: var(--text-main);
+    font-weight: 800; font-size: 0.85rem; padding: 12px 24px; border-radius: 12px; text-decoration: none;
+    transition: 0.3s; border: none; cursor: pointer; box-shadow: 0 6px 18px rgba(255, 201, 60, 0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(255, 201, 60, 0.5); }
+
+  .btn-outline {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: transparent; color: var(--conf-accent); border: 1.5px solid var(--conf-accent);
+    font-weight: 800; font-size: 0.85rem; padding: 12px 24px; border-radius: 12px; text-decoration: none;
+    transition: 0.3s; cursor: pointer;
+  }
+  .btn-outline:hover { background: var(--conf-accent); color: #fff; transform: translateY(-2px); }
+
+  /* ===== PROGRESS BAR ===== */
+  .prog-bg { background: #eaf2fa; height: 10px; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+  .prog-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--conf-accent), #A78BFA); transition: width 0.8s ease; }
+  .goal-text { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-bottom: 10px; }
+  .goal-text strong { color: var(--text-main); font-weight: 800; }
+  .goal-hint { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
+  .goal-hint strong { color: var(--conf-accent); }
+
+  /* ===== QUICK ACTIONS ===== */
+  .quick-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .quick-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    padding: 16px 10px; border-radius: 14px; background: var(--bg-base); border: 1px solid var(--conf-border);
+    color: var(--text-main); font-size: 0.75rem; font-weight: 700; text-align: center; text-decoration: none;
+    transition: 0.3s ease; min-width: 0; overflow: hidden;
+  }
+  .quick-btn i { color: var(--conf-accent); font-size: 1.2rem; transition: 0.3s; }
+  .quick-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+  .quick-btn:hover {
+    background: var(--conf-accent); color: #ffffff; border-color: var(--conf-accent);
+    transform: translateY(-3px); box-shadow: 0 10px 22px rgba(124, 58, 237, 0.25);
+  }
+  .quick-btn:hover i { color: #ffffff; }
+
+  /* ===== TABLE ===== */
+  .table-wrap { overflow-x: auto; }
+  table.activity { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+  table.activity th {
+    text-align: left; padding: 10px 12px; font-size: 0.65rem; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--conf-border); white-space: nowrap;
+  }
+  table.activity td { padding: 14px 12px; border-bottom: 1px solid var(--bg-base); color: var(--text-main); }
+  table.activity tr:hover td { background: #f8fcff; }
+  table.activity tr:last-child td { border-bottom: none; }
+  table.activity td.strong { font-weight: 700; color: var(--text-main); }
+  table.activity td.pts { font-weight: 800; color: #16a34a; }
+
+  .mat-chip {
+    display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px;
+    font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
+  }
+  .mat-ai { background: rgba(124, 58, 237, 0.15); color: var(--conf-accent); }
+  .mat-cloud { background: rgba(14, 165, 233, 0.15); color: #0369a1; }
+  .mat-ux { background: rgba(219, 39, 119, 0.15); color: #be185d; }
+  .mat-gold { background: rgba(255, 201, 60, 0.2); color: #b87700; }
+
+  /* ===== SPEAKER SPECIFIC ===== */
+  .badge-gold { background: rgba(255, 201, 60, 0.15); color: var(--conf-gold-d); border: 1px solid rgba(255, 201, 60, 0.4); }
+  
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1023px) {
+    .sidebar { display: none; }
+    .mobile-nav { display: flex; }
+    .mobile-logo { display: flex; }
+    .header-title { display: none; }
+    .page-title-block { display: block; margin-bottom: 20px; }
+    .main-header { height: 66px; padding: 0 16px; }
+    .date-pill { display: none; }
+    .user-text { display: none; }
+    .user-block { padding-left: 12px; }
+  }
+
+  @media (max-width: 900px) {
+    .two-col-grid { grid-template-columns: 1fr; }
+    .charts-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 640px) {
+    .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .charts-grid { grid-template-columns: 1fr; gap: 14px; }
+    .chart-wrap { height: 200px; }
+    .dash-body { padding: 16px; }
+    .card { padding: 20px; border-radius: 16px; }
+    .stat-card { padding: 18px; border-radius: 16px; }
+    .stat-card .stat-value { font-size: 1.8rem; }
+    .stat-card .stat-icon { width: 40px; height: 40px; font-size: 1rem; margin-bottom: 12px; }
+    .main-header { padding: 0 12px; height: 62px; }
+    .mobile-nav { padding: 8px 12px; }
+    .mobile-nav .nav-btn { padding: 8px 14px; font-size: 0.7rem; }
+    
+    .session-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .session-item .btn-primary, .session-item .btn-outline { width: 100%; }
+
+    table.activity thead { display: none; }
+    table.activity, table.activity tbody, table.activity tr, table.activity td { display: block; width: 100%; }
+    table.activity tr { padding: 12px 0; border-bottom: 1px solid var(--conf-border); }
+    table.activity tr:last-child { border-bottom: none; }
+    table.activity td { padding: 4px 0; border: none; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; }
+    table.activity td::before { content: attr(data-label); font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-right: 10px; }
+
+    .notif-dropdown { width: calc(100vw - 24px); right: -60px; }
+    .profile-menu { right: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="index.html">
+        <img src="stacklylogo.webp" alt="Event Conference Logo"
+             onerror="this.outerHTML='<span style=&quot;color:#FFC93C;font-weight:800;font-size:1.1rem;&quot;><i class=&quot;fa-solid fa-ticket&quot;></i> Event Conf</span>';">
+      </a>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-link active" data-page="dashboard"><i class="fa-solid fa-border-all"></i><span>Speaker Home</span></a>
+      <a class="nav-link" data-page="schedule"><i class="fa-solid fa-calendar-days"></i><span>My Sessions</span></a>
+      <a class="nav-link" data-page="materials"><i class="fa-solid fa-folder-open"></i><span>Materials</span></a>
+      <a class="nav-link" data-page="attendees"><i class="fa-solid fa-users"></i><span>Attendees</span></a>
+      <div class="nav-divider"></div>
+      <a class="nav-link logout" href="login.html" onclick="handleLogout(event)"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-badge">
+        <div class="icon-circle"><i class="fa-solid fa-microphone-lines"></i></div>
+        <div class="role">Speaker</div>
+        <div class="name" id="sidebarUserName">Speaker</div>
+        <div class="status">Verified</div>
+      </div>
+      <div class="sidebar-copy">© 2026 Event Conference</div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main-wrapper">
+
+    <!-- HEADER -->
+    <header class="main-header">
+      <div class="header-left">
+        
+        <div class="mobile-logo">
+          <a href="index.html" style="text-decoration: none;">
+            <img src="stacklylogo.webp" alt="Event Conf"
+                 onerror="this.outerHTML='<span><i class=&quot;fa-solid fa-ticket&quot; style=&quot;color:var(--conf-accent);&quot;></i> Event Conf</span>';">
+          </a>
+        </div>
+
+        <div class="header-title">
+          <h1 id="pageTitle">Speaker Dashboard</h1>
+          <p id="pageSubtitle">Manage your sessions and engage with attendees.</p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="date-pill" id="datePill">
+          <i class="fa-regular fa-calendar"></i>
+          <span id="dateText">Today, Oct 24 2026</span>
+        </div>
+
+        <div style="position: relative;">
+          <button class="bell-btn" id="bellBtn" aria-label="Notifications">
+            <i class="fa-regular fa-bell"></i>
+            <span class="bell-badge">3</span>
+          </button>
+
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-head">
+              <span>Notifications</span>
+              <span class="badge">3 new</span>
+            </div>
+            <div class="notif-item">
+              <div class="ni-icon" style="background:rgba(124,58,237,0.1);color:#7C3AED;"><i class="fa-solid fa-microphone-lines"></i></div>
+              <div class="ni-body">
+                <div class="ni-title">Session Starting Soon</div>
+                <div class="ni-desc">"The Future of AI" starts in 45 mins.</div>
+                <div class="ni-time">5 min ago</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="ni-icon" style="background:#fef3c7;color:#92400e;"><i class="fa-solid fa-file-powerpoint"></i></div>
+              <div class="ni-body">
+                <div class="ni-title">Slides Approved</div>
+                <div class="ni-desc">Your slides for the workshop are approved.</div>
+                <div class="ni-time">1 hour ago</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="ni-icon" style="background:#dcfce7;color:#16a34a;"><i class="fa-solid fa-comment-dots"></i></div>
+              <div class="ni-body">
+                <div class="ni-title">New Q&A Question</div>
+                <div class="ni-desc">An attendee asked a question in Track B.</div>
+                <div class="ni-time">2 hours ago</div>
+              </div>
+            </div>
+            <a href="404.html" class="notif-footer">View all notifications →</a>
+          </div>
+        </div>
+
+        <div class="user-block">
+          <div class="user-text">
+            <div class="name" id="headerUserName">Speaker</div>
+            <div class="role">Speaker</div>
+          </div>
+          <div class="user-avatar" id="profileBtn">
+            <span id="avatarInitials">S</span>
+            <div class="profile-menu" id="profileMenu">
+              <a href="404.html"><i class="fa-regular fa-user"></i>Profile</a>
+              <a href="404.html"><i class="fa-solid fa-gear"></i>Settings</a>
+              <hr>
+              <a href="login.html" class="danger" onclick="handleLogout(event)"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MOBILE NAV -->
+    <div class="mobile-nav">
+      <a class="nav-btn active" data-page="dashboard"><i class="fa-solid fa-border-all"></i> Home</a>
+      <a class="nav-btn" data-page="schedule"><i class="fa-solid fa-calendar-days"></i> Sessions</a>
+      <a class="nav-btn" data-page="materials"><i class="fa-solid fa-folder-open"></i> Materials</a>
+      <a class="nav-btn" data-page="attendees"><i class="fa-solid fa-users"></i> Attendees</a>
+      <a class="nav-btn logout" href="login.html" onclick="handleLogout(event)"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </div>
+
+    <!-- DASHBOARD BODY -->
+    <div class="dash-body">
+
+      <div class="page-title-block">
+        <h1 id="pageTitleMobile">Speaker Dashboard</h1>
+        <p id="pageSubtitleMobile">Manage your sessions and engage with attendees.</p>
+      </div>
+
+      <!-- ============ DASHBOARD ============ -->
+      <div id="section-dashboard" class="content-section active">
+
+        <!-- STATS -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="trend-badge"><i class="fa-solid fa-check"></i> Confirmed</span>
+            <div class="stat-icon" style="background:rgba(124,58,237,0.15);color:#7C3AED;">
+              <i class="fa-solid fa-microphone-lines"></i>
+            </div>
+            <div class="stat-label">My Sessions</div>
+            <div class="stat-value">3</div>
+          </div>
+
+          <div class="stat-card">
+            <span class="trend-badge soft">Live</span>
+            <div class="stat-icon" style="background:rgba(255,201,60,0.2);color:#F0A500;">
+              <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+            <div class="stat-label">Days Remaining</div>
+            <div class="stat-value">2</div>
+          </div>
+
+          <div class="stat-card">
+            <span class="trend-badge"><i class="fa-solid fa-arrow-up"></i> +120</span>
+            <div class="stat-icon" style="background:#dcfce7;color:#16a34a;">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="stat-label">Attendees Booked</div>
+            <div class="stat-value">450</div>
+          </div>
+
+          <div class="stat-card">
+            <span class="trend-badge"><i class="fa-solid fa-star"></i> Top Rated</span>
+            <div class="stat-icon" style="background:#dbeafe;color:#1e40af;">
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <div class="stat-label">Speaker Rating</div>
+            <div class="stat-value">4.9<small>/5</small></div>
+          </div>
+        </div>
+
+        <!-- CHARTS -->
+        <div class="charts-grid">
+          <div class="card">
+            <div class="card-title">
+              <i class="fa-solid fa-chart-line"></i>
+              Attendee Registrations
+              <span class="head-pill">3 Days</span>
+            </div>
+            <div class="chart-wrap"><canvas id="regChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <i class="fa-solid fa-chart-pie"></i>
+              Session Interest
+              <span class="head-pill">By Topic</span>
+            </div>
+            <div class="chart-wrap"><canvas id="topicChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <i class="fa-solid fa-chart-bar"></i>
+              Feedback Score
+              <span class="head-pill">Weekly</span>
+            </div>
+            <div class="chart-wrap"><canvas id="feedbackChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- TWO COLUMN -->
+        <div class="two-col-grid">
+
+          <!-- UP NEXT -->
+          <div class="card">
+            <div class="card-title">
+              <i class="fa-solid fa-clock"></i>
+              Up Next
+              <a href="404.html" class="head-right">View All Sessions →</a>
+            </div>
+
+            <div class="session-item">
+              <div class="si-body">
+                <div class="si-title">Opening Keynote: The Future of AI</div>
+                <div class="si-meta">Main Stage • 450 attendees registered</div>
+                <div class="si-time">10:00 AM - 11:00 AM</div>
+              </div>
+              <a href="404.html" class="btn-primary" style="padding: 8px 16px; font-size: 0.75rem;">Enter Stage</a>
+            </div>
+
+            <div class="session-item">
+              <div class="si-body">
+                <div class="si-title">Panel: Scaling Startups Globally</div>
+                <div class="si-meta">Hall B • 320 attendees registered</div>
+                <div class="si-time">11:30 AM - 12:30 PM</div>
+              </div>
+              <a href="404.html" class="btn-outline" style="padding: 8px 16px; font-size: 0.75rem;">Prepare</a>
+            </div>
+          </div>
+
+          <!-- RIGHT STACK -->
+          <div class="right-stack">
+            <div class="card">
+              <div class="card-title">
+                <i class="fa-solid fa-bullseye"></i>
+                Speaker Readiness
+              </div>
+              <div class="goal-text"><strong>85</strong>% Complete</div>
+              <div class="prog-bg"><div class="prog-fill" style="width:85%;"></div></div>
+              <div class="goal-hint">Upload final slides to reach <strong>100%</strong> 🚀</div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">
+                <i class="fa-solid fa-bolt"></i>
+                Quick Actions
+              </div>
+              <div class="quick-grid">
+                <a href="404.html" class="quick-btn">
+                  <i class="fa-solid fa-upload"></i><span>Upload Slides</span>
+                </a>
+                <a href="404.html" class="quick-btn">
+                  <i class="fa-solid fa-comments"></i><span>Q&A Inbox</span>
+                </a>
+                <a href="404.html" class="quick-btn">
+                  <i class="fa-solid fa-users"></i><span>Attendees</span>
+                </a>
+                <a href="404.html" class="quick-btn">
+                  <i class="fa-solid fa-calendar-check"></i><span>My Schedule</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECENT ACTIVITY TABLE -->
+        <div class="card">
+          <div class="card-title">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            Recent Attendee Q&A
+            <a href="404.html" class="head-right">View All →</a>
+          </div>
+          <div class="table-wrap">
+            <table class="activity">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Question</th>
+                  <th>From</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Time">10:15 AM</td>
+                  <td data-label="Question" class="strong">How will AI impact entry-level jobs?</td>
+                  <td data-label="From">Sarah (Attendee)</td>
+                  <td data-label="Status"><span class="pill scheduled">Unanswered</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Time">10:10 AM</td>
+                  <td data-label="Question" class="strong">Will the slides be available?</td>
+                  <td data-label="From">James (Attendee)</td>
+                  <td data-label="Status"><span class="pill delivered">Answered</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Time">10:05 AM</td>
+                  <td data-label="Question" class="strong">What framework do you recommend?</td>
+                  <td data-label="From">Priya (Attendee)</td>
+                  <td data-label="Status"><span class="pill delivered">Answered</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ SCHEDULE ============ -->
+      <div id="section-schedule" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-calendar-days"></i> My Sessions</div>
+          
+          <div class="session-item">
+            <div class="si-body">
+              <div class="si-title">Opening Keynote: The Future of AI</div>
+              <div class="si-meta">Main Stage • 450 attendees</div>
+              <div class="si-time">Day 1, 10:00 AM - 11:00 AM</div>
+            </div>
+            <a href="404.html" class="btn-primary" style="padding: 8px 16px; font-size: 0.75rem;">Details</a>
+          </div>
+
+          <div class="session-item">
+            <div class="si-body">
+              <div class="si-title">Panel: Scaling Startups Globally</div>
+              <div class="si-meta">Hall B • 320 attendees</div>
+              <div class="si-time">Day 1, 11:30 AM - 12:30 PM</div>
+            </div>
+            <a href="404.html" class="btn-outline" style="padding: 8px 16px; font-size: 0.75rem;">Details</a>
+          </div>
+
+          <div class="session-item">
+            <div class="si-body">
+              <div class="si-title">Hands-On Workshop: React Patterns</div>
+              <div class="si-meta">Lab 1 • 80 attendees</div>
+              <div class="si-time">Day 2, 02:00 PM - 04:00 PM</div>
+            </div>
+            <a href="404.html" class="btn-outline" style="padding: 8px 16px; font-size: 0.75rem;">Details</a>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <a href="404.html" class="btn-primary" style="width: 100%;">Download Personal Schedule <i class="fa-solid fa-download"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ MATERIALS ============ -->
+      <div id="section-materials" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-folder-open"></i> Presentation Materials</div>
+          
+          <div class="session-item">
+            <div class="si-body">
+              <div class="si-title">Keynote Slides (Final)</div>
+              <div class="si-meta">Uploaded Oct 20, 2026 • 4.2 MB</div>
+            </div>
+            <a href="404.html" class="btn-outline" style="padding: 8px 16px; font-size: 0.75rem;">View</a>
+          </div>
+          
+          <div class="session-item">
+            <div class="si-body">
+              <div class="si-title">Workshop Code Repository</div>
+              <div class="si-meta">GitHub Link • Updated Oct 21, 2026</div>
+            </div>
+            <a href="404.html" class="btn-outline" style="padding: 8px 16px; font-size: 0.75rem;">View</a>
+          </div>
+
+          <div class="session-item">
+            <div class="si-body">
+              <div class="si-title">Speaker Bio & Headshot</div>
+              <div class="si-meta">Approved by Organizers</div>
+            </div>
+            <a href="404.html" class="btn-outline" style="padding: 8px 16px; font-size: 0.75rem;">View</a>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <a href="404.html" class="btn-primary" style="width: 100%;"><i class="fa-solid fa-upload"></i> Upload New Material</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ ATTENDEES ============ -->
+      <div id="section-attendees" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-users"></i> Attendee Insights</div>
+          
+          <div class="info-grid">
+            <div class="info-box">
+              <h4>Session Registration</h4>
+              <div class="row"><span>Keynote</span><strong>450</strong></div>
+              <div class="row"><span>Panel</span><strong>320</strong></div>
+              <div class="row"><span>Workshop</span><strong>80</strong></div>
+            </div>
+            <div class="info-box">
+              <h4>Feedback Metrics</h4>
+              <div class="row"><span>Content Quality</span><strong>4.9/5</strong></div>
+              <div class="row"><span>Speaker Delivery</span><strong>4.8/5</strong></div>
+              <div class="row"><span>Overall Value</span><strong>4.9/5</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  const session = window.__CONFERENCE_USER__;
+  if (session && session.name) {
+    const name = session.name;
+    const initial = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+    
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('headerUserName', name);
+    set('avatarInitials', initial);
+    set('sidebarUserName', name);
+    set('pageSubtitle', 'Welcome back, ' + name.split(' ')[0] + '. Ready to present?');
+    set('pageSubtitleMobile', 'Welcome back, ' + name.split(' ')[0] + '. Ready to present?');
+  }
+
+  const titles = {
+    dashboard:   ['Speaker Dashboard', 'Manage your sessions and engage with attendees.'],
+    schedule:    ['My Sessions', 'Your speaking agenda for the event.'],
+    materials:   ['Materials', 'Upload and manage your presentations.'],
+    attendees:   ['Attendees', 'Insights and feedback from your audience.']
+  };
+
+  function navigateTo(page) {
+    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('section-' + page);
+    if (target) target.classList.add('active');
+
+    if (titles[page]) {
+      document.getElementById('pageTitle').textContent = titles[page][0];
+      document.getElementById('pageSubtitle').textContent = titles[page][1];
+      document.getElementById('pageTitleMobile').textContent = titles[page][0];
+      document.getElementById('pageSubtitleMobile').textContent = titles[page][1];
+    }
+
+    document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(l => {
+      l.classList.toggle('active', l.dataset.page === page);
+    });
+    document.querySelectorAll('.mobile-nav .nav-btn[data-page]').forEach(b => {
+      b.classList.toggle('active', b.dataset.page === page);
+    });
+
+    document.querySelector('.dash-body').scrollTop = 0;
+  }
+
+  document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(l => {
+    l.addEventListener('click', e => { e.preventDefault(); navigateTo(l.dataset.page); });
+  });
+  document.querySelectorAll('.mobile-nav .nav-btn[data-page]').forEach(b => {
+    b.addEventListener('click', e => { e.preventDefault(); navigateTo(b.dataset.page); });
+  });
+
+  const datePill = document.getElementById('datePill');
+  if (datePill) {
+    datePill.addEventListener('click', () => {
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const t = new Date();
+      document.getElementById('dateText').textContent = 'Today, ' + t.getDate() + ' ' + months[t.getMonth()] + ' ' + t.getFullYear();
+    });
+  }
+
+  const bell = document.getElementById('bellBtn');
+  const notifDrop = document.getElementById('notifDropdown');
+  if (bell && notifDrop) {
+    bell.addEventListener('click', e => {
+      e.stopPropagation();
+      notifDrop.classList.toggle('show');
+      document.getElementById('profileMenu').classList.remove('show');
+    });
+    document.addEventListener('click', e => {
+      if (!notifDrop.contains(e.target) && !bell.contains(e.target)) notifDrop.classList.remove('show');
+    });
+  }
+
+  const profBtn = document.getElementById('profileBtn');
+  const profMenu = document.getElementById('profileMenu');
+  if (profBtn && profMenu) {
+    profBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      profMenu.classList.toggle('show');
+      notifDrop.classList.remove('show');
+    });
+    document.addEventListener('click', e => {
+      if (!profMenu.contains(e.target) && !profBtn.contains(e.target)) profMenu.classList.remove('show');
+    });
+  }
+})();
+
+function handleLogout(e) {
+  if (e) e.preventDefault();
+  try {
+    sessionStorage.removeItem('event_conference_session');
+    localStorage.removeItem('event_conference_session');
+  } catch (_) {}
+  window.location.replace('login.html');
+}
+
+window.addEventListener('load', function () {
+  const c = { primary: '#1A1046', accent: '#7C3AED', gold: '#FFC93C' };
+
+  const regEl = document.getElementById('regChart');
+  if (regEl) new Chart(regEl, {
+    type: 'line',
+    data: {
+      labels: ['Day 1', 'Day 2', 'Day 3'],
+      datasets: [{
+        data: [450, 320, 80],
+        borderColor: c.accent,
+        backgroundColor: 'rgba(124,58,237,0.15)',
+        tension: 0.4, borderWidth: 2.5, pointRadius: 4,
+        pointBackgroundColor: c.accent,
+        pointBorderColor: '#fff', pointBorderWidth: 2,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#E2E8F0' }, ticks: { font: { size: 10 } } },
+        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+
+  const topicEl = document.getElementById('topicChart');
+  if (topicEl) new Chart(topicEl, {
+    type: 'doughnut',
+    data: {
+      labels: ['AI Keynote', 'Startup Panel', 'React Workshop'],
+      datasets: [{
+        data: [450, 320, 80],
+        backgroundColor: [c.accent, '#0ea5e9', c.gold],
+        borderWidth: 3, borderColor: '#fff', hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10, font: { size: 10 } } } },
+      cutout: '65%'
+    }
+  });
+
+  const feedbackEl = document.getElementById('feedbackChart');
+  if (feedbackEl) new Chart(feedbackEl, {
+    type: 'bar',
+    data: {
+      labels: ['W1','W2','W3','W4','W5','W6'],
+      datasets: [{
+        data: [4.5, 4.6, 4.7, 4.8, 4.9, 4.9],
+        backgroundColor: c.accent,
+        borderRadius: 8,
+        barThickness: 20
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, max: 5, grid: { color: '#E2E8F0' }, ticks: { font: { size: 10 } } },
+        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+});
+
+window.addEventListener('pageshow', function (e) {
+  if (!e.persisted) return;
+  const raw = sessionStorage.getItem('event_conference_session') || localStorage.getItem('event_conference_session');
+  const s = raw ? JSON.parse(raw) : null;
+  const valid = s && s.authenticated === true && s.expiresAt > Date.now() && s.role === 'speaker';
+  if (!valid) window.location.replace('login.html');
+});
+</script>
+
+</body>
+</html>

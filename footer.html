@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>Event Conference - Footer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    :root {
+      --conf-night:      #0F0A28;   /* page background        */
+      --conf-deep:       #1A1046;   /* footer gradient start  */
+      --conf-mid:        #2B1B6B;   /* footer gradient stop   */
+      --conf-violet:     #7C3AED;   /* glow / accents         */
+      --conf-violet-soft:#A78BFA;   /* secondary accent       */
+      --conf-gold:       #FFC93C;   /* primary accent (CTA)   */
+      --conf-gold-deep:  #F0A500;   /* CTA gradient end       */
+      --conf-text:       #F1ECFF;   /* main text              */
+      --conf-muted:      #B9A9E8;   /* muted text             */
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', system-ui, sans-serif;
+    }
+
+    body {
+      background: var(--conf-night);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== FOOTER BASE — EVENT CONFERENCE VIOLET + GOLD ===== */
+    .footer {
+      background: linear-gradient(180deg, #1A1046 0%, #0F0A28 100%);
+      border-top: 3px solid var(--conf-gold);
+      color: var(--conf-text);
+      width: 100%;
+      margin-top: auto;
+    }
+
+    .footer-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 60px 32px 0;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1.3fr;
+      gap: 45px;
+    }
+
+    /* ===== BRAND COLUMN ===== */
+    .footer-brand .logo-section {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .footer-brand .logo-img {
+      height: 64px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    .footer-brand p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: rgba(241, 236, 255, 0.82);
+      max-width: 340px;
+      margin-bottom: 22px;
+    }
+
+    .footer-brand p .highlight {
+      color: var(--conf-gold);
+      font-weight: 700;
+      background: linear-gradient(180deg, transparent 60%, rgba(255, 201, 60, 0.22) 60%);
+      padding: 0 3px;
+      border-radius: 2px;
+    }
+
+    /* ===== SOCIAL ICONS ===== */
+    .social-icons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .social-icons a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(241, 236, 255, 0.06);
+      color: var(--conf-gold);
+      border: 1.5px solid var(--conf-gold);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      font-size: 1.05rem;
+    }
+
+    .social-icons a:hover {
+      background: var(--conf-gold);
+      border-color: var(--conf-gold);
+      color: #1A1046;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(255, 201, 60, 0.4);
+    }
+
+    /* ===== HEADINGS ===== */
+    .footer-heading {
+      color: #ffffff;
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 22px;
+      letter-spacing: 0.4px;
+      position: relative;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--conf-gold);
+      width: 100%;
+    }
+
+    /* ===== LINKS ===== */
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer-links li a {
+      color: rgba(241, 236, 255, 0.85);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid transparent;
+      padding-bottom: 2px;
+      width: fit-content;
+    }
+
+    .footer-links li a i {
+      font-size: 0.8rem;
+      color: var(--conf-gold);
+      transition: 0.2s;
+    }
+
+    .footer-links li a:hover {
+      color: #ffffff;
+      transform: translateX(6px);
+      border-bottom-color: var(--conf-gold);
+    }
+
+    .footer-links li a:hover i {
+      transform: translateX(4px);
+      color: var(--conf-gold);
+    }
+
+    /* ===== NEWSLETTER ===== */
+    .newsletter-text {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: rgba(241, 236, 255, 0.82);
+      margin-bottom: 18px;
+    }
+
+    .newsletter-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+      max-width: 420px;
+    }
+
+    .newsletter-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(241, 236, 255, 0.07);
+      border: 1.5px solid var(--conf-gold);
+      border-radius: 60px;
+      padding: 5px 5px 5px 20px;
+      transition: all 0.3s ease;
+    }
+
+    .newsletter-input-wrap:focus-within {
+      border-color: var(--conf-gold-deep);
+      box-shadow: 0 0 0 4px rgba(255, 201, 60, 0.15);
+      background: rgba(241, 236, 255, 0.1);
+    }
+
+    .newsletter-input-wrap input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--conf-text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      padding: 10px 0;
+    }
+
+    .newsletter-input-wrap input::placeholder {
+      color: rgba(241, 236, 255, 0.5);
+    }
+
+    .newsletter-input-wrap button {
+      background: linear-gradient(135deg, var(--conf-gold), var(--conf-gold-deep));
+      border: none;
+      color: #1A1046;
+      font-weight: 700;
+      font-size: 0.9rem;
+      font-family: inherit;
+      padding: 11px 22px;
+      border-radius: 60px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+
+    .newsletter-input-wrap button:hover {
+      background: linear-gradient(135deg, #FFD766, var(--conf-gold));
+      transform: scale(1.03);
+    }
+
+    /* ===== ALERT MESSAGE UNDER FIELD ===== */
+    .newsletter-alert {
+      min-height: 18px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding-left: 20px;
+      color: transparent;
+      transition: color 0.25s ease, opacity 0.25s ease;
+      opacity: 0;
+    }
+
+    .newsletter-alert.show { opacity: 1; }
+    .newsletter-alert.error { color: #ff8a80; }
+    .newsletter-alert.success { color: var(--conf-gold); }
+
+    /* ===== CONTACT ===== */
+    .footer-contact {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .footer-contact li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: rgba(241, 236, 255, 0.85);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .footer-contact li i {
+      width: 18px;
+      color: var(--conf-gold);
+      font-size: 0.95rem;
+      margin-top: 3px;
+      flex-shrink: 0;
+    }
+
+    .footer-contact li a {
+      color: rgba(241, 236, 255, 0.85);
+      text-decoration: none;
+      transition: 0.2s;
+      border-bottom: 1px solid transparent;
+      padding-bottom: 2px;
+    }
+
+    .footer-contact li a:hover {
+      color: #ffffff;
+      border-bottom-color: var(--conf-gold);
+    }
+
+    /* ===== FOOTER BOTTOM ===== */
+    .footer-bottom-wrap {
+      max-width: 1400px;
+      margin: 45px auto 0;
+      padding: 22px 32px;
+      border-top: 1px solid rgba(241, 236, 255, 0.12);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .footer-bottom-wrap p {
+      color: rgba(241, 236, 255, 0.72);
+      font-size: 0.86rem;
+    }
+
+    .footer-bottom-wrap p strong {
+      color: var(--conf-gold);
+      font-weight: 700;
+    }
+
+    .footer-bottom-links {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-bottom-links a {
+      color: rgba(241, 236, 255, 0.72);
+      text-decoration: none;
+      font-size: 0.86rem;
+      transition: 0.2s;
+      border-bottom: 1px solid transparent;
+      padding-bottom: 2px;
+    }
+
+    .footer-bottom-links a:hover {
+      color: var(--conf-gold);
+      border-bottom-color: var(--conf-gold);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1100px) {
+      .footer-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+      }
+      .footer-brand { grid-column: 1 / -1; }
+      .footer-brand p { max-width: 600px; }
+    }
+
+    @media (max-width: 768px) {
+      .footer-container {
+        padding: 50px 24px 0;
+        gap: 35px;
+      }
+      .footer-bottom-wrap {
+        padding: 20px 24px;
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .footer-container {
+        grid-template-columns: 1fr;
+        gap: 35px;
+        padding: 45px 20px 0;
+      }
+      .footer-brand p { font-size: 0.9rem; }
+
+      .newsletter-input-wrap {
+        flex-direction: column;
+        border-radius: 18px;
+        padding: 14px;
+        gap: 10px;
+        align-items: stretch;
+      }
+      .newsletter-input-wrap input {
+        width: 100%;
+        padding: 12px 16px;
+        background: rgba(241, 236, 255, 0.08);
+        border-radius: 12px;
+      }
+      .newsletter-input-wrap button {
+        width: 100%;
+        justify-content: center;
+        padding: 13px;
+      }
+      .newsletter-alert { padding-left: 6px; }
+    }
+
+    @media (max-width: 480px) {
+      .footer-brand .logo-img { height: 55px; }
+      .footer-heading { font-size: 1.05rem; }
+      .social-icons a { width: 40px; height: 40px; font-size: 0.95rem; }
+
+      .footer-bottom-links { gap: 14px; justify-content: center; }
+      .footer-bottom-wrap { padding: 18px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer class="footer">
+    <div class="footer-container">
+
+      <!-- COLUMN 1: BRAND + TAGLINE + SOCIAL -->
+      <div class="footer-brand">
+        <a href="index.html" class="logo-section">
+          <img src="stacklylogo.webp" alt="Event Conference Logo" class="logo-img" />
+        </a>
+        <p>
+          <span class="highlight">Where ideas meet momentum.</span>
+          Join us for three days of keynotes, hands-on sessions and meaningful
+          conversations with the people shaping what comes next.
+        </p>
+        <div class="social-icons">
+          <a href="404.html" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="404.html" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="404.html" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="404.html" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+      </div>
+
+      <!-- COLUMN 2: QUICK LINKS -->
+      <div>
+        <h3 class="footer-heading">Quick Links</h3>
+        <ul class="footer-links">
+          <li><a href="index.html"><i class="fa-solid fa-chevron-right"></i> Home</a></li>
+          <li><a href="speakers.html"><i class="fa-solid fa-chevron-right"></i> Speakers</a></li>
+          <li><a href="schedule.html"><i class="fa-solid fa-chevron-right"></i> Schedule</a></li>
+          <li><a href="sessions.html"><i class="fa-solid fa-chevron-right"></i> Sessions</a></li>
+          <li><a href="venue.html"><i class="fa-solid fa-chevron-right"></i> Venue</a></li>
+          <li><a href="contact.html"><i class="fa-solid fa-chevron-right"></i> Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- COLUMN 3: ATTENDEE RESOURCES (all 404) -->
+      <div>
+        <h3 class="footer-heading">Attendee Resources</h3>
+        <ul class="footer-links">
+          <li><a href="404.html"><i class="fa-solid fa-chevron-right"></i> Register</a></li>
+          <li><a href="404.html"><i class="fa-solid fa-chevron-right"></i> Travel &amp; Stay</a></li>
+          <li><a href="404.html"><i class="fa-solid fa-chevron-right"></i> Sponsors &amp; Partners</a></li>
+          <li><a href="404.html"><i class="fa-solid fa-chevron-right"></i> Code of Conduct</a></li>
+          <li><a href="404.html"><i class="fa-solid fa-chevron-right"></i> FAQ</a></li>
+        </ul>
+      </div>
+
+      <!-- COLUMN 4: NEWSLETTER + CONTACT -->
+      <div>
+        <h3 class="footer-heading">Newsletter</h3>
+        <p class="newsletter-text">
+          Get speaker announcements, schedule updates and early-bird ticket alerts
+          delivered to your inbox.
+        </p>
+
+        <form class="newsletter-form" id="newsletterForm" novalidate>
+          <div class="newsletter-input-wrap">
+            <input type="email" id="newsletterEmail" placeholder="Enter your email" required aria-label="Email address" />
+            <button type="submit"><i class="fa-solid fa-paper-plane"></i> Subscribe</button>
+          </div>
+          <p class="newsletter-alert" id="newsletterAlert" role="alert" aria-live="polite"></p>
+        </form>
+
+        <ul class="footer-contact">
+          <li><i class="fa-solid fa-location-dot"></i> <a href="404.html">Bengaluru International Convention Centre, Bengaluru</a></li>
+          <li><i class="fa-solid fa-phone"></i> <a href="404.html">+91 98765 43210</a></li>
+          <li><i class="fa-solid fa-envelope"></i> <a href="404.html">hello@eventconference.com</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- ====== FOOTER BOTTOM ====== -->
+    <div class="footer-bottom-wrap">
+      <p>&copy; 2026 <strong>Event Conference</strong>. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="404.html">Privacy Policy</a>
+        <a href="404.html">Terms of Service</a>
+        <a href="404.html">Code of Conduct</a>
+        <a href="404.html">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       SCRIPT — Newsletter validation + redirect
+  ============================================================ -->
+  <script>
+    (function () {
+      const newsForm = document.getElementById('newsletterForm');
+      const emailInput = document.getElementById('newsletterEmail');
+      const alertBox = document.getElementById('newsletterAlert');
+
+      if (!newsForm) return;
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      function showAlert(message, type) {
+        alertBox.textContent = message;
+        alertBox.classList.remove('error', 'success');
+        alertBox.classList.add('show', type);
+      }
+
+      function clearAlert() {
+        alertBox.textContent = '';
+        alertBox.classList.remove('show', 'error', 'success');
+      }
+
+      newsForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+
+        if (email === '') {
+          showAlert('Please enter your email address.', 'error');
+          emailInput.focus();
+          return;
+        }
+
+        if (!emailRegex.test(email)) {
+          showAlert('Please enter a valid email address.', 'error');
+          emailInput.focus();
+          return;
+        }
+
+        showAlert('Subscribed successfully! Redirecting…', 'success');
+        emailInput.value = '';
+
+        setTimeout(() => {
+          window.location.href = '404.html';
+        }, 800);
+      });
+
+      emailInput.addEventListener('input', function () {
+        if (alertBox.classList.contains('show')) clearAlert();
+      });
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Event Conference - Home</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+
+<style>
+  :root {
+    /* Strictly Light Theme Variables */
+    --bg-base:          #F8F5FF; /* Very Light Violet */
+    --bg-surface:       #FFFFFF; /* Pure White */
+    --bg-accent-tint:   #F1ECFF; /* Soft Lavender */
+    
+    /* Consistent Text Colors */
+    --text-main:        #1A1046; /* Deep Violet */
+    --text-muted:       #6B5B95; /* Soft Violet */
+    
+    --conf-accent:      #7C3AED; 
+    --conf-accent-d:    #6D28D9;
+    --conf-gold:        #FFC93C; 
+    --conf-gold-d:      #F0A500;
+    
+    --conf-border:      rgba(124, 58, 237, 0.15);
+    --conf-shadow:      0 15px 35px rgba(26, 16, 70, 0.06);
+    --conf-shadow-hover:0 20px 40px rgba(26, 16, 70, 0.1);
+    
+    --nav-h:            110px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+  html { scroll-behavior: smooth; }
+  
+  html, body { 
+    overflow-x: hidden; 
+    width: 100%;
+    background-color: var(--bg-base) !important; 
+  }
+  
+  body {
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--nav-h) !important; 
+  }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #EBE4F7; }
+  ::-webkit-scrollbar-thumb { background: var(--conf-accent); border-radius: 6px; }
+
+  /* ===== Z-INDEX & LAYOUT FIX ===== */
+  #header-placeholder {
+    width: 100%;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 9999;
+  }
+  .navbar { z-index: 9999 !important; }
+  #footer-placeholder { width: 100%; }
+
+  .main-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden; /* Prevent horizontal scroll from marquee */
+  }
+
+  /* Shared Utilities */
+  .section-header-center {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 50px;
+  }
+  .section-title {
+    font-size: clamp(2rem, 3vw, 2.8rem);
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .section-desc {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px 32px;
+    border-radius: 60px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: 1.5px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn i { transition: transform 0.3s ease; }
+  .btn:hover i.fa-arrow-right { transform: translateX(4px); }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, var(--conf-gold), var(--conf-gold-d));
+    color: var(--text-main);
+    box-shadow: 0 8px 24px rgba(255, 201, 60, 0.3);
+  }
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(255, 201, 60, 0.5);
+  }
+  .btn-outline {
+    background: transparent;
+    border-color: var(--conf-accent);
+    color: var(--conf-accent);
+  }
+  .btn-outline:hover {
+    background: var(--conf-accent);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+  }
+  .center-btn-wrapper {
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  /* ===================================================
+     SECTION 1: HERO
+     =================================================== */
+  .hero-section {
+    padding: 60px 24px 100px;
+    max-width: 1300px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .hero-top-text {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-top-text .badge {
+    display: inline-block;
+    background: rgba(124, 58, 237, 0.08);
+    color: var(--conf-accent);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    border-radius: 30px;
+    margin-bottom: 24px;
+  }
+  .hero-top-text h1 {
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.05;
+    letter-spacing: -3px;
+    margin-bottom: 30px;
+  }
+  .hero-top-text h1 span { color: var(--conf-accent); }
+  
+  .hero-bottom-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    margin-top: -40px;
+    position: relative;
+    z-index: 3;
+  }
+  .hero-image-main {
+    flex: 1;
+    max-width: 800px;
+    height: 500px;
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: var(--conf-shadow);
+    border: 1px solid var(--conf-border);
+  }
+  .hero-image-main img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .hero-floating-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 24px;
+    box-shadow: 0 25px 60px rgba(26, 16, 70, 0.15);
+    border: 1px solid var(--conf-border);
+    width: 320px;
+    flex-shrink: 0;
+    margin-left: -100px; /* Overlap */
+    position: relative;
+    z-index: 4;
+  }
+  .hero-floating-card h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 12px;
+  }
+  .hero-floating-card p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .hero-floating-card .btn { width: 100%; }
+
+  /* ===================================================
+     SECTION 2: BENTO BOX HIGHLIGHTS
+     =================================================== */
+  .bento-section {
+    padding: 100px 24px;
+    background: var(--bg-surface);
+  }
+  .bento-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto;
+    gap: 20px;
+  }
+  .bento-item {
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--conf-border);
+    box-shadow: var(--conf-shadow);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px;
+  }
+  .bento-img {
+    padding: 0;
+    border: none;
+  }
+  .bento-img img { width: 100%; height: 100%; object-fit: cover; min-height: 250px; }
+  
+  .bento-stat {
+    background: var(--bg-accent-tint);
+    text-align: center;
+  }
+  .bento-stat h3 { font-size: 3rem; font-weight: 800; color: var(--conf-accent); margin-bottom: 8px; }
+  .bento-stat p { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  
+  .bento-text {
+    background: #fff;
+  }
+  .bento-text h3 { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 12px; }
+  .bento-text p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+
+  /* Grid Spans */
+  .bento-large-img { grid-column: span 2; grid-row: span 2; }
+  .bento-wide-text { grid-column: span 2; }
+
+  /* ===================================================
+     SECTION 3: FILMSTRIP SPEAKERS
+     =================================================== */
+  .filmstrip-section {
+    padding: 100px 0;
+    background: var(--bg-base);
+    border-top: 1px solid var(--conf-border);
+  }
+  .filmstrip-section .section-header-center { padding: 0 24px; }
+  .filmstrip-container {
+    display: flex;
+    gap: 24px;
+    padding: 20px 24px 40px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+  .filmstrip-container::-webkit-scrollbar { display: none; }
+  
+  .filmstrip-card {
+    flex: 0 0 280px;
+    scroll-snap-align: center;
+    background: #fff;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid var(--conf-border);
+    box-shadow: var(--conf-shadow);
+    transition: transform 0.3s;
+  }
+  .filmstrip-card:hover { transform: translateY(-5px); }
+  .filmstrip-img {
+    height: 300px;
+    width: 100%;
+    object-fit: cover;
+  }
+  .filmstrip-content {
+    padding: 24px;
+    text-align: center;
+  }
+  .filmstrip-content h3 { font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
+  .filmstrip-content p { font-size: 0.85rem; color: var(--conf-accent); font-weight: 700; margin-bottom: 16px; }
+  .filmstrip-content .btn { padding: 10px 20px; font-size: 0.8rem; width: 100%; }
+
+  /* ===================================================
+     SECTION 4: STICKY SCHEDULE PREVIEW
+     =================================================== */
+  .sticky-schedule-section {
+    padding: 100px 24px;
+    background: var(--bg-surface);
+  }
+  .sticky-schedule-layout {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 60px;
+    align-items: start;
+  }
+  .sticky-left {
+    position: sticky;
+    top: 130px;
+  }
+  .sticky-left h2 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.1;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+  }
+  .sticky-left p {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+  
+  .sticky-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .schedule-list-item {
+    background: var(--bg-base);
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid var(--conf-border);
+    transition: 0.3s;
+  }
+  .schedule-list-item:hover {
+    background: #fff;
+    border-color: var(--conf-accent);
+    box-shadow: var(--conf-shadow);
+  }
+  .schedule-list-item .time {
+    display: inline-block;
+    background: var(--conf-accent);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .schedule-list-item h3 { font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
+  .schedule-list-item p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+
+  /* ===================================================
+     SECTION 5: VENUE OVERLAY
+     =================================================== */
+  .venue-overlay-section {
+    padding: 100px 24px;
+    background: var(--bg-accent-tint);
+  }
+  .venue-image-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 500px;
+    border-radius: 40px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--conf-shadow);
+  }
+  .venue-image-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .venue-info-card {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 24px;
+    max-width: 400px;
+    box-shadow: 0 20px 40px rgba(26,16,70,0.2);
+    border: 1px solid #fff;
+  }
+  .venue-info-card h3 { font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 12px; }
+  .venue-info-card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
+
+  /* ===================================================
+     SECTION 6: SPONSORS MARQUEE
+     =================================================== */
+  .sponsors-section {
+    padding: 80px 0;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--conf-border);
+    border-bottom: 1px solid var(--conf-border);
+    overflow: hidden; /* Crucial for marquee */
+  }
+  .sponsors-title {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+  .marquee-wrapper {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .marquee {
+    display: flex;
+    width: max-content;
+    animation: scroll 30s linear infinite;
+  }
+  
+  /* FIX: Pause animation on hover so user can actually click/hover on logos */
+  .marquee:hover {
+    animation-play-state: paused;
+  }
+
+  .marquee-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-right: 50px;
+  }
+  
+  .marquee-content img {
+    height: 45px;
+    margin: 0 40px;
+    opacity: 0.4;
+    transition: all 0.3s ease;
+    filter: grayscale(100%);
+    cursor: pointer;
+  }
+  
+  /* FIX: Added scale effect and ensured filter resets */
+  .marquee-content img:hover {
+    opacity: 1;
+    filter: grayscale(0%);
+    transform: scale(1.15);
+  }
+  
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ===================================================
+     SECTION 7: MASONRY TESTIMONIALS
+     =================================================== */
+  .testimonials-section {
+    padding: 100px 24px;
+    background: var(--bg-base);
+  }
+  .masonry-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    column-count: 3;
+    column-gap: 24px;
+  }
+  .review-card {
+    break-inside: avoid;
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid var(--conf-border);
+    box-shadow: var(--conf-shadow);
+    margin-bottom: 24px;
+  }
+  .review-stars { color: var(--conf-gold); font-size: 0.9rem; margin-bottom: 16px; }
+  .review-text { font-size: 1rem; color: var(--text-main); line-height: 1.6; font-weight: 500; margin-bottom: 24px; font-style: italic; }
+  .review-author { display: flex; align-items: center; gap: 12px; }
+  .review-author img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+  .review-author h4 { font-size: 0.9rem; font-weight: 800; color: var(--text-main); }
+  .review-author p { font-size: 0.8rem; color: var(--text-muted); }
+
+  /* ===================================================
+     SECTION 8: 3D TICKET PRICING
+     =================================================== */
+  .pricing-section {
+    padding: 100px 24px;
+    background: var(--bg-surface);
+  }
+  .pricing-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    align-items: center;
+  }
+  .price-card {
+    background: #fff;
+    border: 1px solid var(--conf-border);
+    border-radius: 30px;
+    padding: 40px;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+  .price-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 30px 60px rgba(26, 16, 70, 0.1);
+    border-color: var(--conf-accent);
+  }
+  .price-card.popular {
+    transform: scale(1.05);
+    border: 2px solid var(--conf-accent);
+    box-shadow: 0 20px 50px rgba(124, 58, 237, 0.15);
+    z-index: 2;
+  }
+  .price-card.popular:hover {
+    transform: scale(1.05) translateY(-10px);
+  }
+  .popular-badge {
+    position: absolute;
+    top: -15px; left: 50%; transform: translateX(-50%);
+    background: var(--conf-accent);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 8px 20px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .price-card h3 { font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 16px; }
+  .price-card .amount { font-size: 3.5rem; font-weight: 800; color: var(--conf-accent); margin-bottom: 24px; line-height: 1; }
+  .price-card .amount span { font-size: 1rem; color: var(--text-muted); font-weight: 600; }
+  .price-features { list-style: none; text-align: left; margin-bottom: 30px; }
+  .price-features li { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .price-features li i { color: var(--conf-gold-d); font-size: 0.9rem; }
+  .price-card .btn { width: 100%; }
+
+  /* ===================================================
+     SECTION 9: EXPERIENCE GALLERY
+     =================================================== */
+  .experience-section {
+    padding: 100px 24px;
+    background: var(--bg-accent-tint);
+  }
+  .experience-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .exp-card {
+    height: 450px;
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--conf-border);
+  }
+  .exp-card img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
+  .exp-card:hover img { transform: scale(1.1); }
+  .exp-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(26,16,70,0.95), transparent 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 30px;
+  }
+  .exp-overlay h3 { color: #fff; font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
+  .exp-overlay p { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 20px; }
+  .exp-overlay .btn { align-self: flex-start; padding: 10px 20px; font-size: 0.85rem; background: #fff; color: var(--text-main); border: none; }
+  .exp-overlay .btn:hover { background: var(--conf-gold); }
+
+  /* ===================================================
+     SECTION 10: GIANT TEXT CTA
+     =================================================== */
+  .giant-text-cta {
+    padding: 120px 24px;
+    background: var(--bg-surface);
+    text-align: center;
+    border-top: 1px solid var(--conf-border);
+  }
+  .giant-text-cta h2 {
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1;
+    letter-spacing: -3px;
+    margin-bottom: 30px;
+  }
+  .giant-text-cta h2 span { color: var(--conf-accent); }
+  .giant-text-cta p {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+  }
+  .cta-form {
+    display: flex;
+    max-width: 500px;
+    margin: 0 auto;
+    gap: 10px;
+  }
+  .cta-form input {
+    flex: 1;
+    padding: 16px 24px;
+    border-radius: 60px;
+    border: 1.5px solid var(--conf-border);
+    background: var(--bg-base);
+    font-family: inherit;
+    font-size: 1rem;
+    outline: none;
+    color: var(--text-main);
+  }
+  .cta-form input:focus { border-color: var(--conf-accent); background: #fff; }
+  .cta-form .btn { padding: 16px 32px; flex-shrink: 0; }
+
+  /* ===================================================
+     RESPONSIVE (MOBILE FIXES)
+     =================================================== */
+  @media (max-width: 1024px) {
+    :root { --nav-h: 95px; }
+    
+    .hero-bottom-layout { flex-direction: column; gap: 30px; margin-top: 20px; }
+    .hero-floating-card { margin-left: 0; width: 100%; max-width: 500px; }
+    
+    .bento-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: auto; }
+    .bento-large-img { grid-column: span 2; grid-row: span 1; height: 300px; }
+    
+    .sticky-schedule-layout { grid-template-columns: 1fr; gap: 40px; }
+    .sticky-left { position: relative; top: 0; text-align: center; }
+    
+    .masonry-grid { column-count: 2; }
+    
+    .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+    .price-card.popular { transform: scale(1); }
+    .price-card.popular:hover { transform: translateY(-10px); }
+    
+    .experience-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    :root { --nav-h: 85px; }
+    
+    .bento-grid { grid-template-columns: 1fr; }
+    .bento-large-img { grid-column: span 1; }
+    .bento-wide-text { grid-column: span 1; }
+    
+    .venue-image-wrap { height: auto; display: flex; flex-direction: column; }
+    .venue-image-wrap img { height: 300px; }
+    .venue-info-card { 
+      position: relative; 
+      bottom: 0; left: 0; width: 100%; max-width: 100%; 
+      border-radius: 0 0 40px 40px; 
+      box-shadow: none;
+      border: none;
+      border-top: 1px solid var(--conf-border);
+    }
+    
+    .masonry-grid { column-count: 1; }
+    
+    .cta-form { flex-direction: column; }
+    .cta-form .btn { width: 100%; }
+    
+    .filmstrip-container { padding-bottom: 20px; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-top-text h1 { font-size: 2.5rem; }
+    .hero-image-main { height: 300px; }
+    .bento-stat h3 { font-size: 2.5rem; }
+    .filmstrip-card { flex: 0 0 85vw; }
+    .venue-info-card { padding: 30px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header-placeholder"></div>
+
+<main class="main-content">
+
+  <!-- ============================================================
+       SECTION 1: HERO
+       ============================================================ -->
+  <section class="hero-section">
+    <div class="hero-top-text" data-aos="fade-down">
+      <span class="badge">October 24-26, 2026 • Bengaluru</span>
+      <h1>The Future is <span>Built Here.</span></h1>
+    </div>
+    
+    <div class="hero-bottom-layout">
+      <div class="hero-image-main" data-aos="zoom-in" data-aos-delay="100">
+        <img src="ec1.webp" alt="Conference Audience" />
+      </div>
+      
+      <div class="hero-floating-card" data-aos="fade-left" data-aos-delay="300">
+        <h3>Join 3,000+ Innovators</h3>
+        <p>Three days of keynotes, hands-on workshops, and networking with the brightest minds in tech.</p>
+        <a href="404.html" class="btn btn-primary">Register Now <i class="fa-solid fa-ticket"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 2: BENTO BOX HIGHLIGHTS
+       ============================================================ -->
+  <section class="bento-section">
+    <div class="section-header-center" data-aos="fade-up">
+      <h2 class="section-title">Why Attend?</h2>
+      <p class="section-desc">Everything you need to level up your career, in one place.</p>
+    </div>
+
+    <div class="bento-grid">
+      <div class="bento-item bento-large-img" data-aos="fade-up" data-aos-delay="100">
+        <img src="ec2.webp" alt="Networking" />
+      </div>
+      
+      <div class="bento-item bento-stat" data-aos="fade-up" data-aos-delay="200">
+        <h3>50+</h3>
+        <p>Expert Speakers</p>
+      </div>
+      
+      <div class="bento-item bento-stat" data-aos="fade-up" data-aos-delay="300">
+        <h3>30+</h3>
+        <p>Hands-on Labs</p>
+      </div>
+      
+      <div class="bento-item bento-text bento-wide-text" data-aos="fade-up" data-aos-delay="400">
+        <h3>Unrivaled Networking</h3>
+        <p>Connect with founders, engineers, and creators from top companies around the globe. Your next big opportunity starts in the hallway.</p>
+        <div style="margin-top: 20px;">
+          <a href="404.html" class="btn btn-outline">Explore Highlights <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 3: FILMSTRIP SPEAKERS
+       ============================================================ -->
+  <section class="filmstrip-section">
+    <div class="section-header-center" data-aos="fade-up">
+      <h2 class="section-title">Featured Speakers</h2>
+      <p class="section-desc">Scroll to discover the industry leaders taking the stage.</p>
+    </div>
+
+    <div class="filmstrip-container" data-aos="fade-up" data-aos-delay="100">
+      <div class="filmstrip-card" data-aos="fade-up" data-aos-delay="100">
+        <img src="ec3.webp" alt="Speaker" class="filmstrip-img" />
+        <div class="filmstrip-content">
+          <h3>Dr. Sarah Chen</h3>
+          <p>CTO at TechVision</p>
+          <a href="404.html" class="btn btn-outline">View Bio</a>
+        </div>
+      </div>
+      <div class="filmstrip-card" data-aos="fade-up" data-aos-delay="200">
+        <img src="ec4.webp" alt="Speaker" class="filmstrip-img" />
+        <div class="filmstrip-content">
+          <h3>James Wilson</h3>
+          <p>Founder of ScaleUp</p>
+          <a href="404.html" class="btn btn-outline">View Bio</a>
+        </div>
+      </div>
+      <div class="filmstrip-card" data-aos="fade-up" data-aos-delay="300">
+        <img src="ec5.webp" alt="Speaker" class="filmstrip-img" />
+        <div class="filmstrip-content">
+          <h3>Priya Sharma</h3>
+          <p>Lead Designer at UX Lab</p>
+          <a href="404.html" class="btn btn-outline">View Bio</a>
+        </div>
+      </div>
+      <div class="filmstrip-card" data-aos="fade-up" data-aos-delay="400">
+        <img src="ec6.webp" alt="Speaker" class="filmstrip-img" />
+        <div class="filmstrip-content">
+          <h3>Marcus Johnson</h3>
+          <p>Security Lead at CloudCorp</p>
+          <a href="404.html" class="btn btn-outline">View Bio</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="center-btn-wrapper" data-aos="fade-up">
+      <a href="404.html" class="btn btn-primary">See All Speakers <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 4: STICKY SCHEDULE PREVIEW
+       ============================================================ -->
+  <section class="sticky-schedule-section">
+    <div class="sticky-schedule-layout">
+      
+      <div class="sticky-left" data-aos="fade-right">
+        <h2>What's on the Agenda?</h2>
+        <p>We've curated a schedule packed with actionable insights, deep dives, and visionary keynotes.</p>
+        <a href="404.html" class="btn btn-outline">View Full Schedule <i class="fa-solid fa-calendar-days"></i></a>
+      </div>
+
+      <div class="sticky-right">
+        <div class="schedule-list-item" data-aos="fade-left" data-aos-delay="100">
+          <span class="time">09:00 AM</span>
+          <h3>Opening Keynote</h3>
+          <p>Kick off the conference with a visionary look at the future of technology and human collaboration.</p>
+        </div>
+        <div class="schedule-list-item" data-aos="fade-left" data-aos-delay="200">
+          <span class="time">11:00 AM</span>
+          <h3>Panel: The AI Revolution</h3>
+          <p>Industry experts discuss the ethical implications and business opportunities of generative AI.</p>
+        </div>
+        <div class="schedule-list-item" data-aos="fade-left" data-aos-delay="300">
+          <span class="time">02:00 PM</span>
+          <h3>Hands-On Workshop</h3>
+          <p>Build your first AI agent using the latest frameworks. Bring your laptop and get ready to code!</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 5: VENUE OVERLAY
+       ============================================================ -->
+  <section class="venue-overlay-section">
+    <div class="venue-image-wrap" data-aos="zoom-in">
+      <img src="ec7.webp" alt="Venue" />
+      <div class="venue-info-card" data-aos="fade-up" data-aos-delay="200">
+        <h3>The Venue</h3>
+        <p>Join us at the state-of-the-art Bengaluru International Centre. Easily accessible, with world-class amenities and ample parking.</p>
+        <a href="404.html" class="btn btn-primary">Get Directions <i class="fa-solid fa-location-dot"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 6: SPONSORS MARQUEE
+       ============================================================ -->
+  <section class="sponsors-section" data-aos="fade-up">
+    <div class="sponsors-title">Powered by Industry Leaders</div>
+    <div class="marquee-wrapper">
+      <div class="marquee">
+        <div class="marquee-content">
+          <img src="ec8.webp" alt="Google" />
+          <img src="ec9.webp" alt="IBM" />
+          <img src="ec10.webp" alt="Netflix" />
+          <img src="ec11.webp" alt="Amazon" />
+          <img src="ec12.webp" alt="Microsoft" />
+        </div>
+        <div class="marquee-content">
+          <img src="ec13.webp" alt="Google" />
+          <img src="ec14.webp" alt="IBM" />
+          <img src="ec15.webp" alt="Netflix" />
+          <img src="ec16.webp" alt="Amazon" />
+          <img src="ec17.webp" alt="Microsoft" />
+        </div>
+      </div>
+    </div>
+    <div class="center-btn-wrapper" style="margin-top: 30px;" data-aos="fade-up">
+      <a href="404.html" class="btn btn-outline">Become a Sponsor <i class="fa-solid fa-handshake"></i></a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 7: MASONRY TESTIMONIALS
+       ============================================================ -->
+  <section class="testimonials-section">
+    <div class="section-header-center" data-aos="fade-up">
+      <h2 class="section-title">What Attendees Say</h2>
+      <p class="section-desc">Don't just take our word for it.</p>
+    </div>
+
+    <div class="masonry-grid">
+      <div class="review-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <p class="review-text">"The best tech conference I've ever attended. The networking opportunities alone were worth the ticket price."</p>
+        <div class="review-author">
+          <img src="ec1.webp" alt="Reviewer" />
+          <div>
+            <h4>David Lee</h4>
+            <p>Software Engineer</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <p class="review-text">"Incredible speakers and hands-on workshops. I came back to my team with so many new ideas to implement."</p>
+        <div class="review-author">
+          <img src="ec2.webp" alt="Reviewer" />
+          <div>
+            <h4>Emma Watson</h4>
+            <p>Product Manager</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <p class="review-text">"The organization was flawless. The venue was stunning, and the food was amazing. Can't wait for next year!"</p>
+        <div class="review-author">
+          <img src="ec3.webp" alt="Reviewer" />
+          <div>
+            <h4>Ryan Reynolds</h4>
+            <p>CTO at StartupX</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="center-btn-wrapper" data-aos="fade-up">
+      <a href="404.html" class="btn btn-outline">Read More Reviews <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 8: 3D TICKET PRICING
+       ============================================================ -->
+  <section class="pricing-section">
+    <div class="section-header-center" data-aos="fade-up">
+      <h2 class="section-title">Secure Your Pass</h2>
+      <p class="section-desc">Choose the experience that fits your goals.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- Tier 1 -->
+      <div class="price-card" data-aos="fade-up" data-aos-delay="100">
+        <h3>Virtual Pass</h3>
+        <div class="amount">$99<span>/pass</span></div>
+        <ul class="price-features">
+          <li><i class="fa-solid fa-check"></i> Live stream access</li>
+          <li><i class="fa-solid fa-check"></i> Session recordings</li>
+          <li><i class="fa-solid fa-check"></i> Digital resources</li>
+        </ul>
+        <a href="404.html" class="btn btn-outline">Get Virtual Pass</a>
+      </div>
+
+      <!-- Tier 2 (Popular) -->
+      <div class="price-card popular" data-aos="fade-up" data-aos-delay="200">
+        <div class="popular-badge">Best Value</div>
+        <h3>Standard Pass</h3>
+        <div class="amount">$299<span>/pass</span></div>
+        <ul class="price-features">
+          <li><i class="fa-solid fa-check"></i> Full in-person access</li>
+          <li><i class="fa-solid fa-check"></i> All keynote & sessions</li>
+          <li><i class="fa-solid fa-check"></i> Networking lounge</li>
+          <li><i class="fa-solid fa-check"></i> Lunch & coffee breaks</li>
+        </ul>
+        <a href="404.html" class="btn btn-primary">Register Now</a>
+      </div>
+
+      <!-- Tier 3 -->
+      <div class="price-card" data-aos="fade-up" data-aos-delay="300">
+        <h3>VIP Pass</h3>
+        <div class="amount">$599<span>/pass</span></div>
+        <ul class="price-features">
+          <li><i class="fa-solid fa-check"></i> Everything in Standard</li>
+          <li><i class="fa-solid fa-check"></i> VIP seating</li>
+          <li><i class="fa-solid fa-check"></i> Speaker dinner invite</li>
+          <li><i class="fa-solid fa-check"></i> Exclusive swag bag</li>
+        </ul>
+        <a href="404.html" class="btn btn-outline">Get VIP Pass</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 9: EXPERIENCE GALLERY
+       ============================================================ -->
+  <section class="experience-section">
+    <div class="section-header-center" data-aos="fade-up">
+      <h2 class="section-title">The Conference Experience</h2>
+      <p class="section-desc">More than just talks. It's an immersive journey.</p>
+    </div>
+
+    <div class="experience-grid">
+      <div class="exp-card" data-aos="fade-up" data-aos-delay="100">
+        <img src="ec4.webp" alt="Networking" />
+        <div class="exp-overlay">
+          <h3>Networking</h3>
+          <p>Connect with peers in our dedicated lounges.</p>
+          <a href="404.html" class="btn">Learn More</a>
+        </div>
+      </div>
+
+      <div class="exp-card" data-aos="fade-up" data-aos-delay="200">
+        <img src="ec5.webp" alt="Workshops" />
+        <div class="exp-overlay">
+          <h3>Workshops</h3>
+          <p>Get hands-on with the latest tech stack.</p>
+          <a href="404.html" class="btn">Learn More</a>
+        </div>
+      </div>
+
+      <div class="exp-card" data-aos="fade-up" data-aos-delay="300">
+        <img src="ec6.webp" alt="Parties" />
+        <div class="exp-overlay">
+          <h3>After Parties</h3>
+          <p>Unwind and celebrate with the community.</p>
+          <a href="404.html" class="btn">Learn More</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 10: GIANT TEXT CTA
+       ============================================================ -->
+  <section class="giant-text-cta">
+    <h2 data-aos="fade-up">Don't Miss <span>Out.</span></h2>
+    <p data-aos="fade-up" data-aos-delay="100">Join thousands of professionals for the tech event of the year.</p>
+    
+    <form class="cta-form" data-aos="fade-up" data-aos-delay="200" onsubmit="event.preventDefault(); window.location.href='404.html';">
+      <input type="email" placeholder="Enter your email address" required />
+      <button type="submit" class="btn btn-primary">Get Ticket <i class="fa-solid fa-arrow-right"></i></button>
+    </form>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<div id="footer-placeholder"></div>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+  // Init AOS
+  AOS.init({ 
+    duration: 800, 
+    easing: 'ease-out-cubic', 
+    once: true, 
+    offset: 80
+  });
+
+  // Load Header and Footer
+  document.addEventListener('DOMContentLoaded', function () {
+    fetch('header.html')
+      .then(r => r.ok ? r.text() : Promise.reject('Header not found'))
+      .then(d => {
+        document.getElementById('header-placeholder').innerHTML = d;
+        initHeader();
+      })
+      .catch(err => console.warn('Header not loaded:', err));
+
+    fetch('footer.html')
+      .then(r => r.ok ? r.text() : Promise.reject('Footer not found'))
+      .then(d => {
+        document.getElementById('footer-placeholder').innerHTML = d;
+        initFooter();
+      })
+      .catch(err => console.warn('Footer not loaded:', err));
+      
+    // Refresh AOS after a slight delay to account for header/footer fetch
+    setTimeout(() => { AOS.refresh(); }, 500);
+  });
+
+  /* ============ HEADER INIT ============ */
+  function initHeader() {
+    const hamburger = document.getElementById('hamburgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (hamburger && mobileMenu) {
+      function toggle() {
+        hamburger.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+        document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+      }
+      function close() {
+        hamburger.classList.remove('active');
+        mobileMenu.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      hamburger.addEventListener('click', toggle);
+      document.addEventListener('click', function (e) {
+        if (mobileMenu.classList.contains('active') &&
+            !hamburger.contains(e.target) &&
+            !mobileMenu.contains(e.target)) close();
+      });
+      window.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+      window.addEventListener('resize', () => { if (window.innerWidth > 768) close(); });
+      document.querySelectorAll('.mobile-nav-link, .mobile-action-link').forEach(l =>
+        l.addEventListener('click', close));
+    }
+  }
+
+  /* ============ FOOTER INIT (newsletter) ============ */
+  function initFooter() {
+    const newsForm = document.getElementById('newsletterForm');
+    if (!newsForm) return;
+
+    const emailInput = document.getElementById('newsletterEmail');
+    const alertBox = document.getElementById('newsletterAlert');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function showAlert(msg, type) {
+      alertBox.textContent = msg;
+      alertBox.classList.remove('error', 'success');
+      alertBox.classList.add('show', type);
+    }
+    function clearAlert() {
+      alertBox.textContent = '';
+      alertBox.classList.remove('show', 'error', 'success');
+    }
+
+    newsForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+
+      if (email === '') { showAlert('Please enter your email address.', 'error'); emailInput.focus(); return; }
+      if (!emailRegex.test(email)) { showAlert('Please enter a valid email address.', 'error'); emailInput.focus(); return; }
+
+      showAlert('Subscribed successfully! Redirecting…', 'success');
+      emailInput.value = '';
+      setTimeout(() => { window.location.href = '404.html'; }, 800);
+    });
+
+    emailInput.addEventListener('input', function () {
+      if (alertBox.classList.contains('show')) clearAlert();
+    });
+  }
+</script>
+
+</body>
+</html>

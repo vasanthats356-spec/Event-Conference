@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>Event Conference - Sign Up</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <!-- Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --conf-night:      #0F0A28;
+      --conf-deep:       #1A1046;
+      --conf-mid:        #2B1B6B;
+      --conf-violet:     #7C3AED;
+      --conf-violet-soft:#A78BFA;
+      --conf-gold:       #FFC93C;
+      --conf-gold-deep:  #F0A500;
+      --conf-text:       #F1ECFF;
+      --conf-muted:      #B9A9E8;
+
+      --ec-border:       rgba(255, 201, 60, 0.30);
+      --ec-input-bg:     rgba(241, 236, 255, 0.06);
+      --ec-input-bd:     rgba(167, 139, 250, 0.28);
+
+      /* space reserved for the fixed navbar */
+      --nav-h:           110px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; }
+
+    html, body { overflow-x: hidden; }
+
+    body {
+      background: var(--conf-night);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      color: var(--conf-text);
+      position: relative;
+      
+      /* Force padding top so content is never hidden under navbar initially */
+      padding-top: var(--nav-h) !important;
+    }
+
+    /* Soft event-style glows */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(110px);
+      z-index: 0;
+      pointer-events: none;
+    }
+    body::before {
+      width: 460px; height: 460px;
+      background: rgba(124, 58, 237, 0.40);
+      top: -160px; left: -160px;
+    }
+    body::after {
+      width: 480px; height: 480px;
+      background: rgba(255, 201, 60, 0.16);
+      bottom: -190px; right: -190px;
+    }
+
+    /* ===== Z-INDEX FIX ===== */
+    /* Header stays on top */
+    #header-placeholder {
+      width: 100%;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 9999;
+    }
+
+    /* Main content goes below header when scrolling */
+    .main-wrapper {
+      max-width: 1140px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Fallback in case header.html doesn't have high z-index */
+    .navbar {
+      z-index: 9999 !important;
+    }
+
+    /* ===== FORM ALIGNMENT ===== */
+    .signup-wrapper {
+      display: flex;
+      flex-direction: column; 
+      justify-content: flex-start;
+      align-items: center;
+      padding: 2.5rem 1rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    .signup-card {
+      /* Using auto margins safely centers the card without clipping the top */
+      margin-top: auto;
+      margin-bottom: auto;
+      position: relative;
+      max-width: 480px;
+      width: 100%;
+      background: linear-gradient(160deg, #1A1046 0%, #0F0A28 100%);
+      border-radius: 26px;
+      border: 1.5px solid var(--ec-border);
+      box-shadow:
+        0 30px 70px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(167, 139, 250, 0.08) inset;
+      overflow: hidden;
+    }
+
+    /* Gold ticket strip on top */
+    .signup-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--conf-gold), #FFE9A3, var(--conf-gold-deep));
+    }
+
+    .signup-form {
+      padding: 2.9rem 2.5rem 2.4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* ===== BRAND ICON ===== */
+    .signup-brand-icon {
+      width: 74px;
+      height: 74px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 201, 60, 0.08);
+      border: 1.5px solid rgba(255, 201, 60, 0.38);
+      box-shadow: 0 0 44px rgba(124, 58, 237, 0.40);
+    }
+    .signup-brand-icon i {
+      font-size: 1.85rem;
+      color: var(--conf-gold);
+      filter: drop-shadow(0 6px 16px rgba(255, 201, 60, 0.35));
+    }
+
+    /* ===== CHIP ===== */
+    .signup-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 auto 18px;
+      padding: 7px 16px;
+      border-radius: 60px;
+      background: rgba(255, 201, 60, 0.10);
+      border: 1px solid rgba(255, 201, 60, 0.42);
+      color: var(--conf-gold);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+    }
+    .signup-chip i { font-size: 0.8rem; }
+
+    .signup-heading {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .signup-subhead {
+      font-size: 0.88rem;
+      color: var(--conf-muted);
+      margin-bottom: 24px;
+      line-height: 1.65;
+    }
+    .signup-subhead strong { color: var(--conf-gold); font-weight: 700; }
+
+    /* ===== FEEDBACK ALERTS ===== */
+    .signup-feedback {
+      display: none;
+      padding: 11px 15px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      line-height: 1.55;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .signup-feedback.show { display: block; }
+    .signup-feedback.success {
+      background: rgba(255, 201, 60, 0.10);
+      color: #FFE0A0;
+      border: 1px solid rgba(255, 201, 60, 0.35);
+      border-left: 4px solid var(--conf-gold);
+    }
+    .signup-feedback.error {
+      background: rgba(255, 90, 80, 0.12);
+      color: #ffb3ad;
+      border: 1px solid rgba(255, 90, 80, 0.32);
+      border-left: 4px solid #ff5a50;
+    }
+    .signup-feedback i { margin-right: 6px; }
+
+    /* ===== GOOGLE ===== */
+    .signup-google-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 16px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--conf-text);
+      font-size: 0.86rem;
+      transition: all 0.25s ease;
+      border-radius: 10px;
+      padding: 11px 16px;
+      background: var(--ec-input-bg);
+      border: 1.5px solid var(--ec-input-bd);
+      justify-content: center;
+      text-decoration: none;
+    }
+    .signup-google-row:hover {
+      background: rgba(241, 236, 255, 0.10);
+      border-color: var(--conf-gold);
+      box-shadow: 0 6px 20px rgba(255, 201, 60, 0.18);
+      transform: translateY(-1px);
+    }
+    .signup-google-icon { display: inline-flex; width: 1.35rem; height: 1.35rem; flex-shrink: 0; }
+    .signup-google-icon svg { width: 100%; height: 100%; display: block; }
+
+    /* ===== DIVIDER ===== */
+    .signup-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin: 4px 0 18px;
+      justify-content: center;
+    }
+    .signup-divider hr {
+      flex: 1;
+      border: none;
+      height: 1px;
+      background: rgba(241, 236, 255, 0.12);
+    }
+    .signup-divider span {
+      color: rgba(185, 169, 232, 0.75);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    /* ===== INPUTS ===== */
+    .signup-input-group {
+      position: relative;
+      margin-bottom: 14px;
+      width: 100%;
+    }
+    .signup-input-group > i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--conf-gold);
+      font-size: 0.9rem;
+      width: 1.1rem;
+      text-align: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .signup-input-group input,
+    .signup-input-group select {
+      width: 100%;
+      padding: 0.78rem 0.9rem 0.78rem 2.5rem;
+      border: 1.5px solid var(--ec-input-bd);
+      border-radius: 10px;
+      font-size: 0.88rem;
+      background: var(--ec-input-bg);
+      transition: 0.18s;
+      outline: none;
+      color: var(--conf-text);
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .signup-input-group select {
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 2.5rem;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23FFC93C' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 12px;
+    }
+    .signup-input-group select option {
+      background: #1A1046;
+      color: var(--conf-text);
+    }
+
+    .signup-input-group input:focus,
+    .signup-input-group select:focus {
+      border-color: var(--conf-gold);
+      box-shadow: 0 0 0 3px rgba(255, 201, 60, 0.16);
+      background: rgba(241, 236, 255, 0.09);
+    }
+
+    .signup-input-group input::placeholder {
+      color: rgba(241, 236, 255, 0.42);
+      font-weight: 400;
+    }
+
+    /* ===== FIELD ERRORS ===== */
+    .signup-error-msg {
+      color: #ff8a80;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      display: none;
+      padding-left: 0.5rem;
+      text-align: left;
+      line-height: 1.4;
+    }
+    .signup-error-msg.show { display: block; }
+    .signup-input-group.has-error { margin-bottom: 0; }
+    .signup-terms-row.has-error { margin-bottom: 0; }
+
+    /* ===== OPTIONS ROW ===== */
+    .signup-terms-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 0.3rem 0 1.2rem 0;
+      font-size: 0.82rem;
+      color: var(--conf-text);
+      cursor: pointer;
+      justify-content: flex-start;
+      text-align: left;
+      font-weight: 500;
+    }
+    .signup-terms-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--conf-gold);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .signup-terms-row a {
+      color: var(--conf-violet-soft);
+      text-decoration: none;
+      font-weight: 700;
+      transition: 0.2s;
+    }
+    .signup-terms-row a:hover {
+      color: var(--conf-gold);
+      text-decoration: underline;
+    }
+
+    /* ===== SUBMIT ===== */
+    .signup-btn-wrapper { display: flex; margin-bottom: 18px; width: 100%; }
+
+    .signup-submit-btn {
+      width: 100%;
+      padding: 0.9rem 0.9rem;
+      background: linear-gradient(135deg, var(--conf-gold), var(--conf-gold-deep));
+      border: none;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: #1A1046;
+      cursor: pointer;
+      transition: all 0.35s ease;
+      letter-spacing: 0.8px;
+      box-shadow: 0 8px 24px rgba(255, 201, 60, 0.30);
+      text-transform: uppercase;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+    .signup-submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+      transition: left 0.55s ease;
+    }
+    .signup-submit-btn:hover::before { left: 100%; }
+    .signup-submit-btn:hover {
+      background: linear-gradient(135deg, #FFD766, var(--conf-gold));
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(255, 201, 60, 0.45);
+    }
+    .signup-submit-btn:disabled { opacity: 0.85; cursor: wait; transform: none; }
+
+    /* ===== SIGNIN ===== */
+    .signin-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--conf-muted);
+    }
+    .signin-text a {
+      color: var(--conf-gold);
+      font-weight: 700;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+    .signin-text a:hover { text-decoration: underline; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      :root { --nav-h: 95px; }
+    }
+
+    @media (max-width: 560px) {
+      .signup-wrapper { padding: 1.75rem 1rem; }
+      .signup-card { border-radius: 22px; }
+      .signup-form { padding: 2.4rem 1.6rem 2rem; }
+      .signup-heading { font-size: 1.5rem; }
+    }
+
+    @media (max-width: 480px) {
+      :root { --nav-h: 85px; }
+    }
+
+    @media (max-width: 420px) {
+      .signup-form { padding: 2rem 1.15rem 1.75rem; }
+      .signup-brand-icon { width: 62px; height: 62px; margin-bottom: 16px; }
+      .signup-brand-icon i { font-size: 1.5rem; }
+      .signup-chip { font-size: 0.66rem; padding: 6px 13px; }
+      .signup-heading { font-size: 1.32rem; }
+      .signup-subhead { font-size: 0.8rem; margin-bottom: 18px; }
+      .signup-input-group input,
+      .signup-input-group select { padding: 0.68rem 0.7rem 0.68rem 2.3rem; font-size: 0.82rem; }
+      .signup-submit-btn { padding: 0.8rem 0.6rem; font-size: 0.82rem; }
+      .signup-error-msg { font-size: 0.72rem; padding-left: 0.4rem; }
+      .signup-terms-row { font-size: 0.75rem; }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #14102e; }
+    ::-webkit-scrollbar-thumb { background: var(--conf-gold-deep); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--conf-gold); }
+  </style>
+</head>
+<body>
+
+  <div id="header-placeholder"></div>
+
+  <div class="main-wrapper">
+    <div class="signup-wrapper">
+      <div class="signup-card">
+
+        <!-- ===== FORM CONTENT (No Images) ===== -->
+        <div class="signup-form">
+
+          <div class="signup-brand-icon">
+            <i class="fa-solid fa-ticket"></i>
+          </div>
+
+          <span class="signup-chip">
+            <i class="fa-solid fa-calendar-day"></i> Event Conference 2026
+          </span>
+
+          <h1 class="signup-heading">Join the Conference</h1>
+          <p class="signup-subhead">
+            Create your <strong>Event Conference</strong> account to secure your pass, build your schedule, and connect with speakers.
+          </p>
+
+          <div class="signup-feedback" id="signupFeedback" role="status" aria-live="polite"></div>
+
+          <!-- Google Sign Up -->
+          <a href="404.html" class="signup-google-row" id="googleSignupBtn">
+            <span class="signup-google-icon">
+              <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+              </svg>
+            </span>
+            <span>Sign up with Google</span>
+          </a>
+
+          <div class="signup-divider"><hr /><span>Or</span><hr /></div>
+
+          <!-- ROLE SELECTOR -->
+          <div class="signup-input-group">
+            <i class="fas fa-user-tag"></i>
+            <select id="signupRole" required>
+              <option value="">Select your account type</option>
+              <option value="attendee">Attendee</option>
+              <option value="speaker">Speaker</option>
+            </select>
+          </div>
+          <div class="signup-error-msg" id="roleError">Please select your account type.</div>
+
+          <!-- Full name -->
+          <div class="signup-input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" id="fullName" placeholder="Enter your full name" required />
+          </div>
+          <div class="signup-error-msg" id="nameError">Please enter your full name (letters and spaces only).</div>
+
+          <!-- Email -->
+          <div class="signup-input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="Enter your email address" required />
+          </div>
+          <div class="signup-error-msg" id="emailError">Please enter a valid email address.</div>
+
+          <!-- Password -->
+          <div class="signup-input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" placeholder="Create a password" required />
+          </div>
+          <div class="signup-error-msg" id="passwordError">Password: min 8 chars, 1 uppercase, 1 number, 1 special.</div>
+
+          <!-- Terms -->
+          <div class="signup-terms-row">
+            <input type="checkbox" id="termsCheck" />
+            <label for="termsCheck">I agree to the <a href="404.html">Terms &amp; Conditions</a></label>
+          </div>
+          <div class="signup-error-msg" id="termsError">You must agree to the Terms &amp; Conditions.</div>
+
+          <!-- Submit -->
+          <div class="signup-btn-wrapper">
+            <button class="signup-submit-btn" id="signupBtn">Create Account</button>
+          </div>
+
+          <div class="signin-text">
+            Already have an account? <a href="login.html" id="signinLink">Sign In</a>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <script>
+    // ============================
+    // LOAD HEADER + FOOTER
+    // ============================
+    document.addEventListener('DOMContentLoaded', function () {
+      fetch('header.html')
+        .then(r => r.ok ? r.text() : Promise.reject('Header not found'))
+        .then(d => {
+          document.getElementById('header-placeholder').innerHTML = d;
+          initHeader();
+        })
+        .catch(err => console.warn('Header not loaded:', err));
+
+      fetch('footer.html')
+        .then(r => r.ok ? r.text() : Promise.reject('Footer not found'))
+        .then(d => {
+          document.getElementById('footer-placeholder').innerHTML = d;
+          initFooter();
+        })
+        .catch(err => console.warn('Footer not loaded:', err));
+    });
+
+    // ============================
+    // HEADER INIT
+    // ============================
+    function initHeader() {
+      const hamburger = document.getElementById('hamburgerBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      if (hamburger && mobileMenu) {
+        function toggleMenu() {
+          hamburger.classList.toggle('active');
+          mobileMenu.classList.toggle('active');
+          document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+          hamburger.setAttribute('aria-expanded', mobileMenu.classList.contains('active'));
+        }
+        function closeMenu() {
+          hamburger.classList.remove('active');
+          mobileMenu.classList.remove('active');
+          document.body.style.overflow = '';
+          hamburger.setAttribute('aria-expanded', 'false');
+        }
+        hamburger.addEventListener('click', toggleMenu);
+        document.addEventListener('click', function (e) {
+          if (mobileMenu.classList.contains('active')) {
+            if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) closeMenu();
+          }
+        });
+        window.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+        window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
+        document.querySelectorAll('.mobile-nav-link, .mobile-action-link').forEach(l =>
+          l.addEventListener('click', closeMenu));
+      }
+    }
+
+    // ============================
+    // FOOTER INIT — newsletter validation
+    // ============================
+    function initFooter() {
+      const newsForm = document.getElementById('newsletterForm');
+      if (!newsForm) return;
+
+      const emailInput = document.getElementById('newsletterEmail');
+      const alertBox = document.getElementById('newsletterAlert');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      function showAlert(message, type) {
+        alertBox.textContent = message;
+        alertBox.classList.remove('error', 'success');
+        alertBox.classList.add('show', type);
+      }
+      function clearAlert() {
+        alertBox.textContent = '';
+        alertBox.classList.remove('show', 'error', 'success');
+      }
+
+      newsForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+
+        if (email === '') {
+          showAlert('Please enter your email address.', 'error');
+          emailInput.focus();
+          return;
+        }
+        if (!emailRegex.test(email)) {
+          showAlert('Please enter a valid email address.', 'error');
+          emailInput.focus();
+          return;
+        }
+
+        showAlert('Subscribed successfully! Redirecting…', 'success');
+        emailInput.value = '';
+        setTimeout(() => { window.location.href = '404.html'; }, 800);
+      });
+
+      emailInput.addEventListener('input', function () {
+        if (alertBox.classList.contains('show')) clearAlert();
+      });
+    }
+
+    // ============================
+    // SIGNUP LOGIC — 2 roles (attendee / speaker)
+    // ============================
+    (function signup() {
+      const roleSelect = document.getElementById('signupRole');
+      const fullNameInput = document.getElementById('fullName');
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+      const termsCheck = document.getElementById('termsCheck');
+
+      const roleError = document.getElementById('roleError');
+      const nameError = document.getElementById('nameError');
+      const emailError = document.getElementById('emailError');
+      const passwordError = document.getElementById('passwordError');
+      const termsError = document.getElementById('termsError');
+      const feedback = document.getElementById('signupFeedback');
+
+      const signupBtn = document.getElementById('signupBtn');
+      
+      // Storage key matching the login page
+      const USERS_KEY = 'event_conference_users';
+
+      function setError(errEl, group, show) {
+        if (show) { errEl.classList.add('show'); if (group) group.classList.add('has-error'); }
+        else { errEl.classList.remove('show'); if (group) group.classList.remove('has-error'); }
+      }
+      function clearGlobal() { feedback.className = 'signup-feedback'; feedback.innerHTML = ''; }
+      function showGlobal(msg, type) {
+        feedback.className = 'signup-feedback show ' + type;
+        feedback.innerHTML = (type === 'success'
+          ? '<i class="fas fa-check-circle"></i>'
+          : '<i class="fas fa-exclamation-circle"></i>') + msg;
+      }
+      function getUsers() { try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); } catch (e) { return []; } }
+      function saveUsers(list) { try { localStorage.setItem(USERS_KEY, JSON.stringify(list)); return true; } catch (e) { return false; } }
+      function emailExists(email) { return getUsers().some(u => u.email === email.toLowerCase()); }
+      
+      function newUserId(count, role) {
+        const prefix = role === 'speaker' ? 'EC-S' : 'EC-A';
+        return prefix + String(1000 + count + 1).padStart(4, '0');
+      }
+
+      // Clear errors on input
+      roleSelect.addEventListener('change', function () {
+        if (roleSelect.value) setError(roleError, roleSelect.closest('.signup-input-group'), false);
+        clearGlobal();
+      });
+      fullNameInput.addEventListener('input', function () {
+        this.value = this.value.replace(/[^A-Za-z\s]/g, '');
+        if (this.value.trim()) setError(nameError, fullNameInput.closest('.signup-input-group'), false);
+        clearGlobal();
+      });
+      emailInput.addEventListener('input', function () {
+        if (this.value.trim()) setError(emailError, emailInput.closest('.signup-input-group'), false);
+        clearGlobal();
+      });
+      passwordInput.addEventListener('input', function () {
+        if (this.value.trim()) setError(passwordError, passwordInput.closest('.signup-input-group'), false);
+        clearGlobal();
+      });
+      termsCheck.addEventListener('change', function () {
+        if (this.checked) setError(termsError, termsCheck.closest('.signup-terms-row'), false);
+        clearGlobal();
+      });
+
+      const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      const pwdOk = v => v.length >= 8 && /[A-Z]/.test(v) && /[0-9]/.test(v) &&
+                          /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(v);
+
+      signupBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        clearGlobal();
+        let valid = true;
+
+        if (!roleSelect.value) {
+          roleError.textContent = 'Please select your account type (Attendee or Speaker).';
+          setError(roleError, roleSelect.closest('.signup-input-group'), true);
+          valid = false;
+        } else setError(roleError, roleSelect.closest('.signup-input-group'), false);
+
+        const name = fullNameInput.value.trim();
+        if (!name || name.length < 2) {
+          nameError.textContent = 'Please enter your full name (min 2 characters).';
+          setError(nameError, fullNameInput.closest('.signup-input-group'), true);
+          valid = false;
+        } else setError(nameError, fullNameInput.closest('.signup-input-group'), false);
+
+        const email = emailInput.value.trim().toLowerCase();
+        if (!email || !emailOk(email)) {
+          emailError.textContent = 'Please enter a valid email address.';
+          setError(emailError, emailInput.closest('.signup-input-group'), true);
+          valid = false;
+        } else setError(emailError, emailInput.closest('.signup-input-group'), false);
+
+        const pwd = passwordInput.value;
+        if (!pwd || !pwdOk(pwd)) {
+          passwordError.textContent = 'Password: min 8 chars, 1 uppercase, 1 number & 1 special character.';
+          setError(passwordError, passwordInput.closest('.signup-input-group'), true);
+          valid = false;
+        } else setError(passwordError, passwordInput.closest('.signup-input-group'), false);
+
+        if (!termsCheck.checked) {
+          termsError.textContent = 'You must agree to the Terms & Conditions.';
+          setError(termsError, termsCheck.closest('.signup-terms-row'), true);
+          valid = false;
+        } else setError(termsError, termsCheck.closest('.signup-terms-row'), false);
+
+        if (!valid) return;
+
+        if (emailExists(email)) {
+          showGlobal('An account with <strong>' + email + '</strong> already exists. Please sign in instead.', 'error');
+          emailError.textContent = 'This email is already registered.';
+          setError(emailError, emailInput.closest('.signup-input-group'), true);
+          return;
+        }
+
+        const users = getUsers();
+        const newUser = {
+          userId: newUserId(users.length, roleSelect.value),
+          name: name,
+          email: email,
+          password: pwd,
+          role: roleSelect.value,
+          createdAt: Date.now()
+        };
+        users.push(newUser);
+
+        if (!saveUsers(users)) {
+          showGlobal('Could not save your account. Please enable storage and try again.', 'error');
+          return;
+        }
+
+        const roleNames = {
+          attendee: 'Attendee',
+          speaker: 'Speaker'
+        };
+        const roleName = roleNames[newUser.role] || 'User';
+
+        try {
+          sessionStorage.setItem('event_conference_signup_success',
+            'Welcome, <strong>' + name.split(' ')[0] + '</strong>! ' +
+            'Your <strong>' + roleName + '</strong> account (' +
+            '<strong>' + newUser.userId + '</strong>) is ready. Please sign in to continue.');
+        } catch (e) {}
+
+        signupBtn.disabled = true;
+        signupBtn.innerHTML = '<i class="fas fa-check"></i> Account Created!';
+        signupBtn.style.background = '#4caf50';
+        signupBtn.style.color = '#ffffff';
+
+        showGlobal('Welcome to Event Conference, <strong>' + name.split(' ')[0] + '</strong>! ' +
+                   'Registered as <strong>' + roleName + '</strong>. ' +
+                   'Redirecting to login…', 'success');
+
+        setTimeout(() => { window.location.href = 'login.html'; }, 1800);
+      });
+
+      document.querySelectorAll('.signup-input-group input, .signup-input-group select').forEach(el => {
+        el.addEventListener('keydown', e => { if (e.key === 'Enter') signupBtn.click(); });
+      });
+
+      document.getElementById('signinLink').addEventListener('click', e => {
+        e.preventDefault();
+        window.location.href = 'login.html';
+      });
+
+      console.log('🎟️ Sign Up page ready! (2 roles: attendee / speaker)');
+    })();
+  </script>
+
+</body>
+</html>
